@@ -149,7 +149,7 @@ const T6Ships = () => {
   
     return (
       <g>
-        <text x={x + width / 2} y={y + height / 2} fill="#666" textAnchor="middle" dominantBaseline="middle">
+        <text x={x + width / 2} y={y + height / 2} fill="#666" textAnchor="middle" dominantBaseline="middle" fontSize="13">
           {value}
         </text>
       </g>
@@ -160,8 +160,8 @@ const T6Ships = () => {
     <Fragment>
       <BarChart
         layout="vertical"
-        width={1600}
-        height={2100}
+        width={800}
+        height={1800}
         data={data}
         margin={{
           top: 0,
@@ -171,8 +171,8 @@ const T6Ships = () => {
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis type="number" />
-        <YAxis dataKey="shipName" type="category" />
+        <XAxis type="number" fontSize="13" />
+        <YAxis dataKey="shipName" type="category" fontSize="13" />
         <Tooltip />
         <Bar dataKey="count" fill="#666">
         {
