@@ -7,7 +7,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend
+  LabelList
 } from "recharts";
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
@@ -96,7 +96,7 @@ const T6Ships = () => {
 
               switch(shipType) {
                 case "AirCarrier":
-                  shipTypeColor = "#fce7ba";
+                  shipTypeColor = "#FFE194";
                   break;
                 case "Destroyer":
                   shipTypeColor = "#BEE0B4";
@@ -144,6 +144,18 @@ const T6Ships = () => {
    
   };
 
+  const renderCustomizedLabel = (props) => {
+    const { x, y, width, height, value } = props;
+  
+    return (
+      <g>
+        <text x={x + width / 2} y={y + height / 2} fill="#666" textAnchor="middle" dominantBaseline="middle">
+          {value}
+        </text>
+      </g>
+    );
+  };
+
   return (
     <Fragment>
       <BarChart
@@ -162,12 +174,13 @@ const T6Ships = () => {
         <XAxis type="number" />
         <YAxis dataKey="shipName" type="category" />
         <Tooltip />
-        <Bar dataKey="count" fill="#8884d8">
+        <Bar dataKey="count" fill="#666">
         {
           data.map((entry, index) => (
             <Cell fill={data[index].shipTypeColor}/>
           ))
         }
+          <LabelList dataKey="count" content={renderCustomizedLabel} />
         </Bar>
       </BarChart>
     </Fragment>
