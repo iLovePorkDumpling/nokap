@@ -26,7 +26,7 @@ export default function App() {
   return (
     <Fragment>
       <CssBaseline />
-      <AppBar position="static">
+      <AppBar position="static" width="100%">
         <Toolbar>
           <DirectionsBoatIcon style={{ fontSize: 40 }} />
           <Typography variant="h3">

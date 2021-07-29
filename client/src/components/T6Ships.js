@@ -7,10 +7,19 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  LabelList
+  LabelList,
+  Legend
 } from "recharts";
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
+
+//CSS
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import ListItem from '@material-ui/core/ListItem';
+import { withStyles } from "@material-ui/core/styles";
+import Divider from '@material-ui/core/Divider';
 
 const T6Ships = () => {
 
@@ -79,44 +88,62 @@ const T6Ships = () => {
       return 0;
     }
 
+    const calculateWR = (battles, wins) => {
+      // Bad
+      // 47 >= Below Average
+      // 49 >= Average
+      // 52 >= Good
+      // 54 >= Very Good
+      // 56 >= Great
+      // 60 >= Unicom
+      // 65 >= Super Unicom
+
+      const wr = (wins/battles) * 100;
+      var wrgroup = "Bad";     
+      if (wr < 47) { wrgroup = "Bad"; } else
+      if (wr < 50) { wrgroup = "Below Average"; } else
+      if (wr < 52) { wrgroup = "Average"; } else
+      if (wr < 54) { wrgroup = "Good"; } else
+      if (wr < 56) { wrgroup = "Very Good"; } else
+      if (wr < 60) { wrgroup = "Great"; } else
+      if (wr < 65) { wrgroup = "Unicom"; } else {
+        wrgroup = "Super Unicom";
+      }
+
+      return wrgroup;
+    }
+
     const prepareData =  () => {
       const newdata = [];
 
       var newitem = null;
-      var shipTypeColor = null;
       NokapMembersData.forEach((member, id) => {
         if (member.ships_data != undefined) {
           const memberShipsData = JSON.parse(member.ships_data);
           memberShipsData.forEach((ship) => {
             if (ShipsData[ship.ship_id] != undefined && ShipsData[ship.ship_id].tier == 6) {
             
-              const shipId = ship.ship_id;
               const shipName = ShipsData[ship.ship_id].name;
               const shipType = ShipsData[ship.ship_id].type;
-
-              switch(shipType) {
-                case "AirCarrier":
-                  shipTypeColor = "#FFE194";
-                  break;
-                case "Destroyer":
-                  shipTypeColor = "#BEE0B4";
-                  break;
-                case "Battleship":
-                  shipTypeColor = "#86c6ee";
-                  break;
-                case "Cruiser":
-                  shipTypeColor = "#FF9C9F";
-                  break;
-                default:
-                  // code block
-              } 
+              const playerName = member.nickname;
+              const wrgroup = calculateWR(ship.pvp.battles, ship.pvp.wins);
 
               newitem = {
-                shipId: shipId,
                 shipName: shipName,
                 shipType: shipType,
-                shipTypeColor: shipTypeColor,
-                count: 1
+                SuperUnicom: 0,
+                SuperUnicomPlayers: [],
+                Unicom: 0,
+                UnicomPlayers: [],
+                Great: 0,
+                GreatPlayers: [],
+                VeryGood: 0,
+                VeryGoodPlayers: [],
+                Good: 0,
+                GoodPlayers: [],
+                Average: 0,
+                BelowAverage: 0,
+                Bad: 0          
               };
 
               if (newdata.length == 0) {
@@ -127,7 +154,40 @@ const T6Ships = () => {
                 var found = newdata.find(x => x.shipName == shipName);
                 if (found != undefined) {
                   //If found, +1 to count
-                  found.count++;
+                  switch(wrgroup) {
+                    case "Super Unicom":
+                      found.SuperUnicom++;
+                      found.SuperUnicomPlayers.push(playerName);
+                      break;
+                    case "Unicom":
+                      found.Unicom++;
+                      found.UnicomPlayers.push(playerName);
+                      break;
+                    case "Great":
+                      found.Great++;
+                      found.GreatPlayers.push(playerName);
+                      break;
+                    case "Very Good":
+                      found.VeryGood++;
+                      found.VeryGoodPlayers.push(playerName);
+                      break;
+                    case "Good":
+                      found.Good++;
+                      found.GoodPlayers.push(playerName);
+                      break;
+                    case "Average":
+                      found.Average++;
+                      break; 
+                    case "Below Average":
+                      found.BelowAverage++;
+                      break;
+                    case "Bad":
+                      found.Bad++;
+                      break;                
+                    default:
+                      // code block
+                  } 
+                  
                 } else {
                   //If not found, add new item
                   newdata.push(newitem);
@@ -138,8 +198,7 @@ const T6Ships = () => {
         }
       });
 
-      newdata.sort(sortbyShiptype);
-
+      newdata.sort(sortbyShiptype);      
       setData(newdata);
    
   };
@@ -147,41 +206,103 @@ const T6Ships = () => {
   const renderCustomizedLabel = (props) => {
     const { x, y, width, height, value } = props;
   
-    return (
-      <g>
-        <text x={x + width / 2} y={y + height / 2} fill="#666" textAnchor="middle" dominantBaseline="middle" fontSize="13">
-          {value}
-        </text>
-      </g>
-    );
+    if (value > 0) {
+      return (
+        <g>
+          <text x={x + width / 2} y={y + height / 2} fill="#fff" textAnchor="middle" dominantBaseline="middle" fontSize="13">
+            {value}
+          </text>
+        </g>
+      );
+    } else {
+      return "";
+    }
+  };
+
+  const SuperUnicomTypography = withStyles({ root: { color: "#A00DC5" }})(Typography);
+  const UnicomTypography = withStyles({ root: { color: "#D042F3" }})(Typography);
+  const GreatTypography = withStyles({ root: { color: "#02C9B3" }})(Typography);
+  const VeryGoodTypography = withStyles({ root: { color: "#318000" }})(Typography);
+  const GoodTypography = withStyles({ root: { color: "#44B300" }})(Typography);
+  
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <Card>
+          <CardContent>
+            <SuperUnicomTypography variant="body2" component="p">            
+              {payload[0].payload.SuperUnicomPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+            </SuperUnicomTypography>
+            <Divider />
+            <UnicomTypography variant="body2" component="p">
+              {payload[0].payload.UnicomPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+            </UnicomTypography>
+            <Divider />
+            <GreatTypography variant="body2" component="p">
+              {payload[0].payload.GreatPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+            </GreatTypography>
+            <Divider />
+            <VeryGoodTypography variant="body2" component="p">
+              {payload[0].payload.VeryGoodPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+            </VeryGoodTypography>
+            <Divider />
+            <GoodTypography variant="body2" component="p">
+              {payload[0].payload.GoodPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+            </GoodTypography>
+          </CardContent>     
+        </Card>
+      );
+    }
+  
+    return null;
   };
 
   return (
     <Fragment>
       <BarChart
-        layout="vertical"
-        width={800}
-        height={1800}
+        layout="horizontal"
+        width={6000}
+        height={800}
         data={data}
+        reverseStackOrder="true"
+        maxBarSize={60}
         margin={{
-          top: 0,
-          right: 50,
-          left: 50,
-          bottom: 50
+          top: 50,
+          right: 20,
+          left: 0,
+          bottom: 20
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis type="number" fontSize="13" />
-        <YAxis dataKey="shipName" type="category" fontSize="13" />
-        <Tooltip />
-        <Bar dataKey="count" fill="#666">
-        {
-          data.map((entry, index) => (
-            <Cell fill={data[index].shipTypeColor}/>
-          ))
-        }
-          <LabelList dataKey="count" content={renderCustomizedLabel} />
+        <XAxis dataKey="shipName" fontSize="13" />
+        <YAxis fontSize="13" />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend align="left" verticalAlign="bottom" wrapperStyle={{bottom: -20, left: 50, fontSize: "13px"}}  />
+        <Bar dataKey="SuperUnicom" stackId="a" fill="#A00DC5" >
+          <LabelList dataKey="SuperUnicom" content={renderCustomizedLabel} />
         </Bar>
+        <Bar dataKey="Unicom" stackId="a" fill="#D042F3" >
+          <LabelList dataKey="Unicom" content={renderCustomizedLabel} />
+        </Bar>
+        <Bar dataKey="Great" stackId="a" fill="#02C9B3" >
+          <LabelList dataKey="Great" content={renderCustomizedLabel} />
+        </Bar>
+        <Bar dataKey="VeryGood" stackId="a" fill="#318000" >
+          <LabelList dataKey="VeryGood" content={renderCustomizedLabel} />
+        </Bar>
+        <Bar dataKey="Good" stackId="a" fill="#44B300" >
+          <LabelList dataKey="Good" content={renderCustomizedLabel} />
+        </Bar>
+        <Bar dataKey="Average" stackId="a" fill="#FFC71F" >
+          <LabelList dataKey="Average" content={renderCustomizedLabel} />
+        </Bar>
+        <Bar dataKey="BelowAverage" stackId="a" fill="#FE7903" >
+          <LabelList dataKey="BelowAverage" content={renderCustomizedLabel} />
+        </Bar>
+        <Bar dataKey="Bad" stackId="a" fill="#FE0E00" >
+          <LabelList dataKey="Bad" content={renderCustomizedLabel} />
+        </Bar>                 
       </BarChart>
     </Fragment>
   );
