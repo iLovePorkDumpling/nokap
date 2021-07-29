@@ -161,7 +161,7 @@ const T6Ships = () => {
       <BarChart
         layout="vertical"
         width={1600}
-        height={4000}
+        height={2100}
         data={data}
         margin={{
           top: 0,
