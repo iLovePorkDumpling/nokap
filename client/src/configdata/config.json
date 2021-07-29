@@ -1,0 +1,12 @@
+{
+  "APPLICATION_ID": "240bbe537bf2cfb71c3c80f8de70bcff",
+  "NOKAP_CLAN_ID": "1000044644",
+  "CLAN_INFO_API": "https://api.worldofwarships.com/wows/clans/info/",
+  "CLAN_INFO_FIELDS": "members_ids",
+  "ACCOUNT_INFO_API": "https://api.worldofwarships.com/wows/account/info/",
+  "ACCOUNT_INFO_FIELDS": "nickname, statistics.pvp.battles, statistics.pvp.wins",
+  "PLAYER_SHIP_API": "https://api.worldofwarships.com/wows/ships/stats/",
+  "PLAYER_SHIP_FIELDS": "account_id, ship_id, pvp.battles, pvp.wins",
+  "SHIPS_INFO_API": "https://api.worldofwarships.com/wows/encyclopedia/ships",
+  "SHIP_INFO_FIELDS": "ship_id, name, nation, tier, type"
+}

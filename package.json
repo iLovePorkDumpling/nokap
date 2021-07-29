@@ -11,7 +11,7 @@
     "start": "node index.js",
     "heroku-postbuild": "cd client && npm install && npm run build"
   },
-  "author": "henry",
+  "author": "The_Fast_and_the_Curious",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
