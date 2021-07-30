@@ -10,8 +10,14 @@ import {
   LabelList,
   Legend
 } from "recharts";
+
+//Components
+import ShipsFilter from "./ShipsFilter";
+
+//Data
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
+import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
 
 //CSS
 import Card from '@material-ui/core/Card';
@@ -24,6 +30,7 @@ import Divider from '@material-ui/core/Divider';
 const T6Ships = () => {
 
   const [data, setData] = useState([]);
+  const [allData, setAllData] = useState([]);
 
   //const [playerData, setPlayerData] = useState([]);
 
@@ -76,6 +83,7 @@ const T6Ships = () => {
     useEffect(() => {
       prepareData();
       //getAllT6ShipNames();
+      
     }, []);
 
     const sortbyShiptype = (a, b) => {
@@ -219,9 +227,22 @@ const T6Ships = () => {
         }
       });
 
-      newdata.sort(sortbyShiptype);      
-      setData(newdata);
-   
+      newdata.sort(sortbyShiptype);            
+      setAllData(newdata);
+      //TODO: Hack solution, please fix
+      let shipFilterValue = "Recommended"
+      const checkShipType = (element) => {      
+        if (shipFilterValue === "All") {
+          return true;
+        } else {
+          if (shipFilterValue === "Recommended") {
+            return RecommendedT6Ships.indexOf(element.shipName) > -1;
+          } else {
+            return element.shipType === shipFilterValue;
+          }
+        }
+      }
+      setData(newdata.filter(checkShipType));
   };
 
   const renderCustomizedLabel = (props) => {
@@ -279,27 +300,43 @@ const T6Ships = () => {
     return null;
   };
 
+  const shipTypeFilterChangeHandler = (shipFilterValue) => {
+    const checkShipType = (element) => {      
+      if (shipFilterValue === "All") {
+        return true;
+      } else {
+        if (shipFilterValue === "Recommended") {
+          return RecommendedT6Ships.indexOf(element.shipName) > -1;
+        } else {
+          return element.shipType === shipFilterValue;
+        }
+      }
+    }
+    setData(allData.filter(checkShipType));
+  }
+
   return (
-    <Fragment>
+    <Fragment>      
+      <ShipsFilter parentCallback={shipTypeFilterChangeHandler}/>
       <BarChart
-        layout="horizontal"
-        width={6000}
-        height={800}
+        layout="vertical"
+        width={1000}
+        height={60*data.length}
         data={data}
         reverseStackOrder="true"
         maxBarSize={60}
         margin={{
-          top: 50,
+          top: 20,
           right: 20,
-          left: 0,
+          left: 50,
           bottom: 20
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="shipName" fontSize="13" />
-        <YAxis fontSize="13" />
+        <XAxis type="number" fontSize="13" />
+        <YAxis dataKey="shipName" type="category" fontSize="13" />
         <Tooltip content={<CustomTooltip />} />
-        <Legend align="left" verticalAlign="bottom" wrapperStyle={{bottom: -20, left: 50, fontSize: "13px"}}  />
+        <Legend align="right" verticalAlign="top" wrapperStyle={{top: -40, right: 10, fontSize: "13px"}}  />
         <Bar dataKey="SuperUnicom" stackId="a" fill="#A00DC5" >
           <LabelList dataKey="SuperUnicom" content={renderCustomizedLabel} />
         </Bar>
