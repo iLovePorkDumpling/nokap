@@ -113,6 +113,27 @@ const T6Ships = () => {
       return wrgroup;
     }
 
+    const shortenShipName = (shipName) => {
+      switch(shipName) {
+        case "Erich Loewenhardt":
+          return "E. Loewenhardt";
+        case "Prinz Eitel Friedrich":
+          return "PE. Friedrich";
+        case "W. Virginia 1941":
+          return "W. Virginia";
+        case "Admiral Graf Spee":
+          return "Graf Spee";
+        case "Admiral Makarov":
+          return "Makarov";
+        case "HSF Admiral Graf Spee":
+          return "Graf Spee";
+        // case "La Galissonnière":
+        //   return "HSF Graf Spee";
+        default:
+          return shipName;
+      }
+    }
+
     const prepareData =  () => {
       const newdata = [];
 
@@ -123,7 +144,7 @@ const T6Ships = () => {
           memberShipsData.forEach((ship) => {
             if (ShipsData[ship.ship_id] != undefined && ShipsData[ship.ship_id].tier == 6) {
             
-              const shipName = ShipsData[ship.ship_id].name;
+              const shipName = shortenShipName(ShipsData[ship.ship_id].name);
               const shipType = ShipsData[ship.ship_id].type;
               const playerName = member.nickname;
               const wrgroup = calculateWR(ship.pvp.battles, ship.pvp.wins);
