@@ -150,7 +150,7 @@ const T6Ships = () => {
         if (member.ships_data != undefined) {
           const memberShipsData = JSON.parse(member.ships_data);
           memberShipsData.forEach((ship) => {
-            if (ShipsData[ship.ship_id] != undefined && ShipsData[ship.ship_id].tier == 6) {
+            if (ShipsData[ship.ship_id] != undefined && ShipsData[ship.ship_id].tier == 6 && ship.pvp.battles > 9) {
             
               const shipName = shortenShipName(ShipsData[ship.ship_id].name);
               const shipType = ShipsData[ship.ship_id].type;
