@@ -20,6 +20,8 @@ import ShipsData from "../configdata/shipsdata.json";
 import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
 
 //CSS
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
@@ -265,8 +267,7 @@ const T6Ships = () => {
   const UnicomTypography = withStyles({ root: { color: "#D042F3" }})(Typography);
   const GreatTypography = withStyles({ root: { color: "#02C9B3" }})(Typography);
   const VeryGoodTypography = withStyles({ root: { color: "#318000" }})(Typography);
-  const GoodTypography = withStyles({ root: { color: "#44B300" }})(Typography);
-  
+  const GoodTypography = withStyles({ root: { color: "#44B300" }})(Typography);  
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -315,53 +316,75 @@ const T6Ships = () => {
     setData(allData.filter(checkShipType));
   }
 
+  const SuperUnicomPlayerNames = () => {
+
+    console.log(data);
+    return (<ListItem >hello</ListItem>);
+  }
+
   return (
-    <Fragment>      
+    <Fragment>       
       <ShipsFilter parentCallback={shipTypeFilterChangeHandler}/>
-      <BarChart
-        layout="vertical"
-        width={1000}
-        height={60*data.length}
-        data={data}
-        reverseStackOrder="true"
-        maxBarSize={60}
-        margin={{
-          top: 20,
-          right: 20,
-          left: 50,
-          bottom: 20
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis type="number" fontSize="13" />
-        <YAxis dataKey="shipName" type="category" fontSize="13" />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend align="right" verticalAlign="top" wrapperStyle={{top: -40, right: 10, fontSize: "13px"}}  />
-        <Bar dataKey="SuperUnicom" stackId="a" fill="#A00DC5" >
-          <LabelList dataKey="SuperUnicom" content={renderCustomizedLabel} />
-        </Bar>
-        <Bar dataKey="Unicom" stackId="a" fill="#D042F3" >
-          <LabelList dataKey="Unicom" content={renderCustomizedLabel} />
-        </Bar>
-        <Bar dataKey="Great" stackId="a" fill="#02C9B3" >
-          <LabelList dataKey="Great" content={renderCustomizedLabel} />
-        </Bar>
-        <Bar dataKey="VeryGood" stackId="a" fill="#318000" >
-          <LabelList dataKey="VeryGood" content={renderCustomizedLabel} />
-        </Bar>
-        <Bar dataKey="Good" stackId="a" fill="#44B300" >
-          <LabelList dataKey="Good" content={renderCustomizedLabel} />
-        </Bar>
-        <Bar dataKey="Average" stackId="a" fill="#FFC71F" >
-          <LabelList dataKey="Average" content={renderCustomizedLabel} />
-        </Bar>
-        <Bar dataKey="BelowAverage" stackId="a" fill="#FE7903" >
-          <LabelList dataKey="BelowAverage" content={renderCustomizedLabel} />
-        </Bar>
-        <Bar dataKey="Bad" stackId="a" fill="#FE0E00" >
-          <LabelList dataKey="Bad" content={renderCustomizedLabel} />
-        </Bar>                 
-      </BarChart>
+      <Grid container spacing={3}>
+        <Grid item xs={8}>
+          <BarChart
+            layout="vertical"
+            width={1000}
+            height={60*data.length}
+            data={data}
+            reverseStackOrder="true"
+            maxBarSize={60}
+            margin={{
+              top: 20,
+              right: 20,
+              left: 50,
+              bottom: 20
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" fontSize="13" />
+            <YAxis dataKey="shipName" type="category" fontSize="13" />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend align="right" verticalAlign="top" wrapperStyle={{top: -40, right: 10, fontSize: "13px"}}  />
+            <Bar dataKey="SuperUnicom" stackId="a" fill="#A00DC5" >
+              <LabelList dataKey="SuperUnicom" content={renderCustomizedLabel} />
+            </Bar>
+            <Bar dataKey="Unicom" stackId="a" fill="#D042F3" >
+              <LabelList dataKey="Unicom" content={renderCustomizedLabel} />
+            </Bar>
+            <Bar dataKey="Great" stackId="a" fill="#02C9B3" >
+              <LabelList dataKey="Great" content={renderCustomizedLabel} />
+            </Bar>
+            <Bar dataKey="VeryGood" stackId="a" fill="#318000" >
+              <LabelList dataKey="VeryGood" content={renderCustomizedLabel} />
+            </Bar>
+            <Bar dataKey="Good" stackId="a" fill="#44B300" >
+              <LabelList dataKey="Good" content={renderCustomizedLabel} />
+            </Bar>
+            <Bar dataKey="Average" stackId="a" fill="#FFC71F" >
+              <LabelList dataKey="Average" content={renderCustomizedLabel} />
+            </Bar>
+            <Bar dataKey="BelowAverage" stackId="a" fill="#FE7903" >
+              <LabelList dataKey="BelowAverage" content={renderCustomizedLabel} />
+            </Bar>
+            <Bar dataKey="Bad" stackId="a" fill="#FE0E00" >
+              <LabelList dataKey="Bad" content={renderCustomizedLabel} />
+            </Bar>                 
+          </BarChart>
+        </Grid>
+        <Grid item xs={4}>
+          <Card>
+            <CardContent>              
+              <Typography variant="h7" component="h7">
+                Top Dogs
+              </Typography>
+              <SuperUnicomTypography variant="body2" component="p"> 
+                <SuperUnicomPlayerNames />
+              </SuperUnicomTypography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>     
     </Fragment>
   );
 }
