@@ -13,6 +13,7 @@ import {
 
 //Components
 import ShipsFilter from "./ShipsFilter";
+import TopDogs from "./TopDogs";
 
 //Data
 import NokapMembersData from "../configdata/nokapmembersdata.json";
@@ -21,7 +22,6 @@ import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
 
 //CSS
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
@@ -108,16 +108,20 @@ const T6Ships = () => {
       // 60 >= Unicom
       // 65 >= Super Unicom
 
-      const wr = (wins/battles) * 100;
-      var wrgroup = "Bad";     
-      if (wr < 47) { wrgroup = "Bad"; } else
-      if (wr < 50) { wrgroup = "Below Average"; } else
-      if (wr < 52) { wrgroup = "Average"; } else
-      if (wr < 54) { wrgroup = "Good"; } else
-      if (wr < 56) { wrgroup = "Very Good"; } else
-      if (wr < 60) { wrgroup = "Great"; } else
-      if (wr < 65) { wrgroup = "Unicom"; } else {
-        wrgroup = "Super Unicom";
+      if (battles > 0) {
+        const wr = (wins/battles) * 100;
+        var wrgroup = "Bad";     
+        if (wr < 47) { wrgroup = "Bad"; } else
+        if (wr < 50) { wrgroup = "Below Average"; } else
+        if (wr < 52) { wrgroup = "Average"; } else
+        if (wr < 54) { wrgroup = "Good"; } else
+        if (wr < 56) { wrgroup = "Very Good"; } else
+        if (wr < 60) { wrgroup = "Great"; } else
+        if (wr < 65) { wrgroup = "Unicom"; } else {
+          wrgroup = "Super Unicom";
+        }
+      } else {
+        wrgroup = "Bad";
       }
 
       return wrgroup;
@@ -152,11 +156,13 @@ const T6Ships = () => {
         if (member.ships_data != undefined) {
           const memberShipsData = JSON.parse(member.ships_data);
           memberShipsData.forEach((ship) => {
-            if (ShipsData[ship.ship_id] != undefined && ShipsData[ship.ship_id].tier == 6 && ship.pvp.battles > 9) {
-            
+              if (ShipsData[ship.ship_id] != undefined && ShipsData[ship.ship_id].tier == 6 && ship.pvp.battles > 9) {
               const shipName = shortenShipName(ShipsData[ship.ship_id].name);
               const shipType = ShipsData[ship.ship_id].type;
-              const playerName = member.nickname;
+              var wr = Math.round((ship.pvp.wins/ship.pvp.battles)*100);
+              if (ship.pvp.battles === 0) { wr = 0; }
+              //const playerName = member.nickname + " " + wr + "% - " + ship.pvp.battles + " battles";
+              const playerName = member.nickname + " / " + ship.pvp.battles + " battles";
               const wrgroup = calculateWR(ship.pvp.battles, ship.pvp.wins);
 
               newitem = {
@@ -173,9 +179,49 @@ const T6Ships = () => {
                 Good: 0,
                 GoodPlayers: [],
                 Average: 0,
+                AveragePlayers: [],
                 BelowAverage: 0,
-                Bad: 0          
+                BelowAveragePlayers: [],
+                Bad: 0,
+                BadPlayers: []        
               };
+
+              switch(wrgroup) {
+                case "Super Unicom":
+                  newitem.SuperUnicom++;
+                  newitem.SuperUnicomPlayers.push(playerName);
+                  break;
+                case "Unicom":
+                  newitem.Unicom++;
+                  newitem.UnicomPlayers.push(playerName);
+                  break;
+                case "Great":
+                  newitem.Great++;
+                  newitem.GreatPlayers.push(playerName);
+                  break;
+                case "Very Good":
+                  newitem.VeryGood++;
+                  newitem.VeryGoodPlayers.push(playerName);
+                  break;
+                case "Good":
+                  newitem.Good++;
+                  newitem.GoodPlayers.push(playerName);
+                  break;
+                case "Average":
+                  newitem.Average++;
+                  newitem.AveragePlayers.push(playerName);
+                  break; 
+                case "Below Average":
+                  newitem.BelowAverage++;
+                  newitem.BelowAveragePlayers.push(playerName);
+                  break;
+                case "Bad":
+                  newitem.Bad++;
+                  newitem.BadPlayers.push(playerName);
+                  break;                
+                default:
+                  // code block
+              }
 
               if (newdata.length == 0) {
                 //newdata array is empty
@@ -208,12 +254,15 @@ const T6Ships = () => {
                       break;
                     case "Average":
                       found.Average++;
+                      found.AveragePlayers.push(playerName);
                       break; 
                     case "Below Average":
                       found.BelowAverage++;
+                      found.BelowAveragePlayers.push(playerName);
                       break;
                     case "Bad":
                       found.Bad++;
+                      found.BadPlayers.push(playerName);
                       break;                
                     default:
                       // code block
@@ -268,6 +317,8 @@ const T6Ships = () => {
   const GreatTypography = withStyles({ root: { color: "#02C9B3" }})(Typography);
   const VeryGoodTypography = withStyles({ root: { color: "#318000" }})(Typography);
   const GoodTypography = withStyles({ root: { color: "#44B300" }})(Typography);  
+  const AverageTypography = withStyles({ root: { color: "#FFC71F" }})(Typography);  
+  const GreyTypography = withStyles({ root: { color: "#666" }})(Typography);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -293,6 +344,15 @@ const T6Ships = () => {
             <GoodTypography variant="body2" component="p">
               {payload[0].payload.GoodPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
             </GoodTypography>
+            <Divider />
+            <AverageTypography variant="body2" component="p">
+              {payload[0].payload.AveragePlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+            </AverageTypography>
+            {/* <Divider />
+            <GreyTypography variant="body2" component="p">
+              {payload[0].payload.BelowAveragePlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+              {payload[0].payload.BadPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
+            </GreyTypography> */}
           </CardContent>     
         </Card>
       );
@@ -316,17 +376,11 @@ const T6Ships = () => {
     setData(allData.filter(checkShipType));
   }
 
-  const SuperUnicomPlayerNames = () => {
-
-    console.log(data);
-    return (<ListItem >hello</ListItem>);
-  }
-
   return (
     <Fragment>       
       <ShipsFilter parentCallback={shipTypeFilterChangeHandler}/>
-      <Grid container spacing={3}>
-        <Grid item xs={8}>
+      <Grid container spacing={1}>
+        <Grid item xs={7}>
           <BarChart
             layout="vertical"
             width={1000}
@@ -372,18 +426,9 @@ const T6Ships = () => {
             </Bar>                 
           </BarChart>
         </Grid>
-        <Grid item xs={4}>
-          <Card>
-            <CardContent>              
-              <Typography variant="h7" component="h7">
-                Top Dogs
-              </Typography>
-              <SuperUnicomTypography variant="body2" component="p"> 
-                <SuperUnicomPlayerNames />
-              </SuperUnicomTypography>
-            </CardContent>
-          </Card>
-        </Grid>
+        {/* <Grid item xs={3}>
+          <TopDogs data={data} />
+        </Grid> */}
       </Grid>     
     </Fragment>
   );
