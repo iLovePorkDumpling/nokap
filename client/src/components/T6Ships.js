@@ -19,6 +19,8 @@ import TopDogs from "./TopDogs";
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
 import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
+//import ExpectedShipData from '../configdata/shipsexpecteddata.json';
+
 
 //CSS
 import Grid from '@material-ui/core/Grid';
@@ -34,58 +36,8 @@ const T6Ships = () => {
   const [data, setData] = useState([]);
   const [allData, setAllData] = useState([]);
 
-  //const [playerData, setPlayerData] = useState([]);
-
-  // const handleSaveToPC = (jsonData,filename) => {
-  //   const fileData = JSON.stringify(jsonData);
-  //   const blob = new Blob([fileData], {type: "text/plain"});
-  //   const url = URL.createObjectURL(blob);
-  //   const link = document.createElement('a');
-  //   link.download = `${filename}.json`;
-  //   link.href = url;
-  //   link.click();
-  // }
-
-  // const getAllT6ShipNames = () => {
-  //   const newdata = [];
-  //   NokapMembersData.forEach((item, i) => {
-  //     var shipNames = "";
-  //     if (item.ships_data != undefined) {
-  //       const shipsDataJson = JSON.parse(item.ships_data);
-  //       shipsDataJson.forEach((item) => {
-  //         if (ShipsData[item.ship_id] != undefined && ShipsData[item.ship_id].tier == 6) {
-  //           shipNames += ShipsData[item.ship_id].name + " ";
-  //         }
-  //       });
-  //       console.log(shipNames);
-  //       const newitem = {
-  //         id: item.id,
-  //         nickname: item.nickname,
-  //         statistics: item.statistics,
-  //         ships_data: item.ships_data,
-  //         ship_names: shipNames
-  //       }
-  //       newdata.push(newitem);
-  //     } else {
-  //       const newitem = {
-  //         id: item.id,
-  //         nickname: item.nickname,
-  //         statistics: item.statistics,
-  //         ships_data: item.ships_data,
-  //         ship_names: ""
-  //       }
-  //       newdata.push(newitem);
-  //     }
-  //   });
-
-  //   setPlayerData(newdata);
-  //   //handleSaveToPC(newdata, "nokapmembersdata");
-  // }
-
     useEffect(() => {
-      prepareData();
-      //getAllT6ShipNames();
-      
+      prepareData();      
     }, []);
 
     const sortbyShiptype = (a, b) => {
@@ -161,7 +113,6 @@ const T6Ships = () => {
               const shipType = ShipsData[ship.ship_id].type;
               var wr = Math.round((ship.pvp.wins/ship.pvp.battles)*100);
               if (ship.pvp.battles === 0) { wr = 0; }
-              //const playerName = member.nickname + " " + wr + "% - " + ship.pvp.battles + " battles";
               const playerName = member.nickname + " / " + ship.pvp.battles + " battles";
               const wrgroup = calculateWR(ship.pvp.battles, ship.pvp.wins);
 
@@ -375,6 +326,10 @@ const T6Ships = () => {
     }
     setData(allData.filter(checkShipType));
   }
+
+  // const colorFilterChangeHandler = (colorFilterValue) => {
+  //   ExpectedShipData.
+  // }
 
   return (
     <Fragment>       
