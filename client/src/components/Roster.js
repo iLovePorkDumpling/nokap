@@ -1,5 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { useTable } from "react-table";
+import PlayerSearchForm from "./PlayerSearchForm";
 import ShipsData from "../configdata/shipsdata.json";
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 
@@ -9,58 +10,33 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import { Grid } from '@material-ui/core';
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const Roster = () => {
 
   const [data, setData] = useState([]);
-
-  const handleSaveToPC = (jsonData,filename) => {
-    const fileData = JSON.stringify(jsonData);
-    const blob = new Blob([fileData], {type: "text/plain"});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `${filename}.json`;
-    link.href = url;
-    link.click();
-  }
+  const [searchablePlayers, setSearchablePlayers] = useState([]);
+  const [addedPlayers, setAddedPlayer] = React.useState([]);
+  const [seachedPlayer, setSeachedPlayer] = React.useState('');
 
   useEffect(() => {
-    getShipNames();
+    prepareData();
   }, []);
 
-  const getShipNames = () => {
-    const newdata = [];
-    NokapMembersData.forEach((item, i) => {
-      var shipNames = "";
-      if (item.ships_data != undefined) {
-        const shipsDataJson = JSON.parse(item.ships_data);
-        shipsDataJson.forEach((item) => {
-          if (ShipsData[item.ship_id] != undefined && ShipsData[item.ship_id].tier == 6) {
-            shipNames += ShipsData[item.ship_id].name + " ";
-          }
-        });
-        const newitem = {
-          id: item.id,
-          nickname: item.nickname,
-          statistics: item.statistics,
-          ships_data: item.ships_data,
-          ship_names: shipNames
-        }
-        newdata.push(newitem);
-      } else {
-        const newitem = {
-          id: item.id,
-          nickname: item.nickname,
-          statistics: item.statistics,
-          ships_data: item.ships_data,
-          ship_names: ""
-        }
-        newdata.push(newitem);
+  const prepareData = () => {
+    setData (NokapMembersData);
+    const searchable = [];
+    NokapMembersData.forEach((player) => {
+      const newItem = {
+        playerId: player.id,
+        nickname: player.nickname
       }
+      searchable.push(newItem);
     });
-
-    setData (newdata);
-    //handleSaveToPC(newdata, "newdata");
+    setSearchablePlayers(searchable);
   }
 
   const columns = React.useMemo(
@@ -106,39 +82,67 @@ const Roster = () => {
       }),
   },
   });
+
+  const addPlayer = (playerName) => {
+    console.log(playerName);
+  }
  
   // Render the UI for your table
   return (
     <Fragment>
-      <MaUTable {...getTableProps()}>
-        <TableHead>
-          {headerGroups.map(headerGroup => (
-            <TableRow {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <TableCell {...column.getHeaderProps()}>
-                  {column.render('Header')}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableHead>
-        <TableBody>
-          {rows.map((row, i) => {
-            prepareRow(row)
-            return (
-              <TableRow {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return (
-                    <TableCell {...cell.getCellProps()}>
-                      {cell.render('Cell')}
+      <Grid container spacing={3}>
+        <Grid item xs={7}>
+          <MaUTable {...getTableProps()}>
+            <TableHead>
+              {headerGroups.map(headerGroup => (
+                <TableRow {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(column => (
+                    <TableCell {...column.getHeaderProps()}>
+                      {column.render('Header')}
                     </TableCell>
-                  )
-                })}
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </MaUTable>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHead>
+            <TableBody>
+              {rows.map((row, i) => {
+                prepareRow(row)
+                return (
+                  <TableRow {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                      return (
+                        <TableCell {...cell.getCellProps()}>
+                          {cell.render('Cell')}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </MaUTable>
+        </Grid>
+        {/* <Grid item xs={2}>
+        <Autocomplete
+          value={seachedPlayer}
+          onChange={(event, newValue) => {
+            setSeachedPlayer(newValue);
+            addedPlayers.push(newValue);
+            console.log(newValue);
+          }}
+          options={searchablePlayers}
+          getOptionLabel={(option) => option.nickname}
+          style={{ width: 300 }}
+          renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
+        />
+        <Paper>
+          {addedPlayers?.map((player) => (
+            <li key={player?.id}>{player?.nickname}
+            </li>
+          ))}
+        </Paper>
+        </Grid> */}
+      </Grid>
     </Fragment>
   );
 }
