@@ -16,15 +16,16 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import { green } from '@material-ui/core/colors';
 
 const Roster = () => {
 
   const [data, setData] = useState([]);
   const [allData, setAllData] = useState([]);
   const [searchablePlayers, setSearchablePlayers] = useState([]);
-  const [addedPlayers, setAddedPlayer] = React.useState([]);
-  const [seachedPlayer, setSeachedPlayer] = React.useState('');
+  const [addedPlayers, setAddedPlayers] = React.useState([]);
 
   useEffect(() => {
     prepareData();
@@ -91,6 +92,11 @@ const Roster = () => {
     setData(filteredData);
   }
 
+  const clearPlayerEventHandler= () => {
+    setData(allData);
+    setAddedPlayers([]);
+  }
+
   const ListAddedPlayers = () => addedPlayers.map(player => (<Typography variant="body2" component="p">{player}<br/><br/></Typography>));
  
   // Render the UI for your table
@@ -128,21 +134,29 @@ const Roster = () => {
             </TableBody>
           </MaUTable>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={5}>
           <Box pl={5}>
-            <Autocomplete
-              value={seachedPlayer}
-              onChange={(event, newValue) => {
-                if (newValue != null) {
-                setSeachedPlayer(newValue);
-                addedPlayers.push(newValue);
-                filterPlayers();
-              }}}
-              options={searchablePlayers}
-              getOptionLabel={(option) => option}
-              style={{ width: 300 }}
-              renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
-            />
+            <Grid container direction="row" alignItems="left">
+              <Grid item>
+                <Autocomplete
+                  value=""
+                  onChange={(event, newValue) => {
+                    if (newValue != null) {
+                    addedPlayers.push(newValue);
+                    filterPlayers();
+                  }}}
+                  options={searchablePlayers}
+                  getOptionLabel={(option) => option}
+                  style={{ width: 300 }}
+                  renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
+                />
+              </Grid>
+              <Grid item> 
+                <Box pl={2}>
+                  <Button style={{ height: 54 }} variant="contained" color="primary" onClick={clearPlayerEventHandler}>Clear Players List</Button>
+                </Box>
+              </Grid>
+            </Grid>
           </Box>
           <Box pt={3} pl={5}>
             <ListAddedPlayers />
