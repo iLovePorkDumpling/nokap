@@ -339,7 +339,7 @@ const T6Ships = () => {
           <BarChart
             layout="vertical"
             width={1000}
-            height={60*data.length}
+            height={53*data.length}
             data={data}
             reverseStackOrder="true"
             maxBarSize={60}
