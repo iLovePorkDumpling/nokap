@@ -269,7 +269,7 @@ const T6Ships = () => {
   const VeryGoodTypography = withStyles({ root: { color: "#318000" }})(Typography);
   const GoodTypography = withStyles({ root: { color: "#44B300" }})(Typography);  
   const AverageTypography = withStyles({ root: { color: "#FFC71F" }})(Typography);  
-  const GreyTypography = withStyles({ root: { color: "#666" }})(Typography);
+  const GreyTypography = withStyles({ root: { color: "#989898" }})(Typography);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -299,11 +299,11 @@ const T6Ships = () => {
             <AverageTypography variant="body2" component="p">
               {payload[0].payload.AveragePlayers.map((item, id) => <ListItem >{item}</ListItem>)}
             </AverageTypography>
-            {/* <Divider />
+            <Divider />
             <GreyTypography variant="body2" component="p">
               {payload[0].payload.BelowAveragePlayers.map((item, id) => <ListItem >{item}</ListItem>)}
               {payload[0].payload.BadPlayers.map((item, id) => <ListItem >{item}</ListItem>)}
-            </GreyTypography> */}
+            </GreyTypography>
           </CardContent>     
         </Card>
       );
