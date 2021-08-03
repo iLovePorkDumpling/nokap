@@ -12,12 +12,16 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import { Grid } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const Roster = () => {
 
   const [data, setData] = useState([]);
+  const [allData, setAllData] = useState([]);
   const [searchablePlayers, setSearchablePlayers] = useState([]);
   const [addedPlayers, setAddedPlayer] = React.useState([]);
   const [seachedPlayer, setSeachedPlayer] = React.useState('');
@@ -28,13 +32,10 @@ const Roster = () => {
 
   const prepareData = () => {
     setData (NokapMembersData);
+    setAllData(NokapMembersData);
     const searchable = [];
     NokapMembersData.forEach((player) => {
-      const newItem = {
-        playerId: player.id,
-        nickname: player.nickname
-      }
-      searchable.push(newItem);
+      searchable.push(player.nickname);
     });
     setSearchablePlayers(searchable);
   }
@@ -83,9 +84,14 @@ const Roster = () => {
   },
   });
 
-  const addPlayer = (playerName) => {
-    console.log(playerName);
+  const filterPlayers = () => {
+    var filteredData = allData.filter(function(itm){
+      return addedPlayers.indexOf(itm.nickname) > -1;
+    });
+    setData(filteredData);
   }
+
+  const ListAddedPlayers = () => addedPlayers.map(player => (<Typography variant="body2" component="p">{player}<br/><br/></Typography>));
  
   // Render the UI for your table
   return (
@@ -122,26 +128,26 @@ const Roster = () => {
             </TableBody>
           </MaUTable>
         </Grid>
-        {/* <Grid item xs={2}>
-        <Autocomplete
-          value={seachedPlayer}
-          onChange={(event, newValue) => {
-            setSeachedPlayer(newValue);
-            addedPlayers.push(newValue);
-            console.log(newValue);
-          }}
-          options={searchablePlayers}
-          getOptionLabel={(option) => option.nickname}
-          style={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
-        />
-        <Paper>
-          {addedPlayers?.map((player) => (
-            <li key={player?.id}>{player?.nickname}
-            </li>
-          ))}
-        </Paper>
-        </Grid> */}
+        <Grid item xs={2}>
+          <Box pl={5}>
+            <Autocomplete
+              value={seachedPlayer}
+              onChange={(event, newValue) => {
+                if (newValue != null) {
+                setSeachedPlayer(newValue);
+                addedPlayers.push(newValue);
+                filterPlayers();
+              }}}
+              options={searchablePlayers}
+              getOptionLabel={(option) => option}
+              style={{ width: 300 }}
+              renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
+            />
+          </Box>
+          <Box pt={3} pl={5}>
+            <ListAddedPlayers />
+          </Box>
+        </Grid>
       </Grid>
     </Fragment>
   );
