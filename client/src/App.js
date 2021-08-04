@@ -18,7 +18,7 @@ import Roster from "./components/Roster";
 import T6Ships from "./components/T6Ships";
 
 export default function App() {
-  const [value, setValue] = React.useState(3);
+  const [value, setValue] = React.useState(2);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
