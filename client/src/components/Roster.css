@@ -1,0 +1,35 @@
+.badPrColor {
+    color: #FE0E00;
+}
+
+.belowAveragePrColor {
+    color: #FE7903;
+}
+
+.averagePrColor {
+    color: #FFC71F;
+}
+
+.goodPrColor {
+    color: #44B300;
+}
+
+.veryGoodPrColor {
+    color: #318000;
+}
+
+.greatPrColor {
+    color: #02C9B3;
+}
+
+.unicumPrColor {
+    color: #D042F3;
+}
+
+.superUnicumPrColor {
+    color: #A00DC5;
+}
+
+.greyPrColor {
+    color: #989898;
+}

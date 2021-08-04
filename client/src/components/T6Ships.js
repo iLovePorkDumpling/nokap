@@ -79,37 +79,16 @@ const T6Ships = () => {
       return wrgroup;
     }
 
-    const shortenShipName = (shipName) => {
-      switch(shipName) {
-        case "Erich Loewenhardt":
-          return "E. Loewenhardt";
-        case "Prinz Eitel Friedrich":
-          return "PE. Friedrich";
-        case "W. Virginia 1941":
-          return "W. Virginia";
-        case "Admiral Graf Spee":
-          return "Graf Spee";
-        case "Admiral Makarov":
-          return "Makarov";
-        case "HSF Admiral Graf Spee":
-          return "Graf Spee";
-        // case "La Galissonnière":
-        //   return "HSF Graf Spee";
-        default:
-          return shipName;
-      }
-    }
-
     const prepareData =  () => {
       const newdata = [];
 
       var newitem = null;
-      NokapMembersData.forEach((member, id) => {
+      NokapMembersData.forEach((member) => {
         if (member.ships_data != undefined) {
           const memberShipsData = JSON.parse(member.ships_data);
           memberShipsData.forEach((ship) => {
               if (ShipsData[ship.ship_id] != undefined && ShipsData[ship.ship_id].tier == 6 && ship.pvp.battles > 9) {
-              const shipName = shortenShipName(ShipsData[ship.ship_id].name);
+              const shipName = ShipsData[ship.ship_id].name;
               const shipType = ShipsData[ship.ship_id].type;
               var wr = Math.round((ship.pvp.wins/ship.pvp.battles)*100);
               if (ship.pvp.battles === 0) { wr = 0; }
