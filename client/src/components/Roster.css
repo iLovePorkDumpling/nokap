@@ -1,35 +1,35 @@
-.badPrColor {
+.badColor {
     color: #FE0E00;
 }
 
-.belowAveragePrColor {
+.belowAverageColor {
     color: #FE7903;
 }
 
-.averagePrColor {
+.averageColor {
     color: #FFC71F;
 }
 
-.goodPrColor {
+.goodColor {
     color: #44B300;
 }
 
-.veryGoodPrColor {
+.veryGoodColor {
     color: #318000;
 }
 
-.greatPrColor {
+.greatColor {
     color: #02C9B3;
 }
 
-.unicumPrColor {
+.unicumColor {
     color: #D042F3;
 }
 
-.superUnicumPrColor {
+.superUnicumColor {
     color: #A00DC5;
 }
 
-.greyPrColor {
+.greyColor {
     color: #989898;
 }

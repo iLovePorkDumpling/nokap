@@ -42,6 +42,11 @@ const Roster = () => {
       searchable.push(player.nickname);
     });
     setSearchablePlayers(searchable);
+    getAccountWrDmgFrag();
+  }
+
+  const roundToTwoDecimal = (num) => {
+    return Math.round(num * 100) / 100;
   }
 
   const getAccountWrDmgFrag = () => {
@@ -51,11 +56,18 @@ const Roster = () => {
     var avgDmg = 0;
     var avgFrags = 0;
     NokapMembersData.forEach((player) => {
-      if (player.statistics.pvp != undefined) {
-        battles = player.statistics.pvp.battles;
-        wr = (player.statistics.pvp.wins / battles) * 100;
-        avgDmg = player.statistics.pvp.damage_dealt/battles;
-        avgFrags = player.statistics.pvp.frags/battles;
+      if (player.statistics != undefined) {
+        const stats = JSON.parse(player.statistics);
+        battles = stats.pvp.battles;
+        if  (battles != 0) {
+          wr = roundToTwoDecimal((stats.pvp.wins / battles) * 100);
+          avgDmg = (stats.pvp.damage_dealt/battles).toFixed(0);
+          avgFrags = roundToTwoDecimal(stats.pvp.frags/battles);
+        } else {
+          wr = 0;
+          avgDmg = 0;
+          avgFrags = 0;
+        }
       }
 
       const newitem = {
@@ -70,6 +82,7 @@ const Roster = () => {
         ship_names: player.ship_names
       };
 
+      console.log(newitem);
       newData.push(newitem);
 
     });
@@ -95,29 +108,29 @@ const Roster = () => {
         accessor: 'statistics',
         show: false,
       },
-      // {
-      //   Header: 'Battles',
-      //   accessor: 'battles',
-      // },
-      // {
-      //   Header: 'WR',
-      //   accessor: 'wr',
-      // },
-      // {
-      //   Header: 'Damage',
-      //   accessor: 'dmg',
-      // },
-      // {
-      //   Header: 'Avg. Frags',
-      //   accessor: 'avgFrags',
-      // },
+      {
+        Header: 'Battles',
+        accessor: 'battles',
+      },
+      {
+        Header: 'WR',
+        accessor: 'wr',
+      },
+      {
+        Header: 'Damage',
+        accessor: 'dmg',
+      },
+      {
+        Header: 'Avg. Frags',
+        accessor: 'avgFrags',
+      },
       {
         Header: 'Ships Data',
         accessor: 'ships_data',
         show: false,
       },
       {
-        Header: 'T6 Ships',
+        Header: 'T6 Ships (Color based on PR)',
         accessor: 'ship_names',
       },
     ], []);
@@ -223,9 +236,76 @@ const Roster = () => {
           <ShipsList shipsList={greyShips} /><br/>
         </div>
       );
+    } else if (cell.column.id === "wr") {
+      const color = getWrGroupColor(cell.row.values.wr);
+      const style = { fontWeight: 'bold'};
+      return (<span class={color} style={style}>{cell.row.values.wr}</span>);
+    } else if (cell.column.id === "battles") {
+      const color = getBattlesGroupColor(cell.row.values.battles);
+      const style = { fontWeight: 'bold'};
+      return (<span class={color} style={style}>{cell.row.values.battles}</span>);
+    } else if (cell.column.id === "dmg") {
+      const color = getDmgGroupColor(cell.row.values.dmg);
+      const style = { fontWeight: 'bold'};
+      return (<span class={color} style={style}>{cell.row.values.dmg}</span>);
+    } else if (cell.column.id === "avgFrags") {
+      const color = getAvgFragsGroupColor(cell.row.values.avgFrags);
+      const style = { fontWeight: 'bold'};
+      return (<span class={color} style={style}>{cell.row.values.avgFrags}</span>);
     } else {
       return cell.render('Cell');
     }
+  }
+
+  const getAvgFragsGroupColor = (battles) => {
+    var color = "";     
+    if (battles < 0.55) { color = "badColor"; } else
+    if (battles < 0.7) { color = "belowAverageColor"; } else
+    if (battles < 0.9) { color = "averageColor"; } else
+    if (battles < 1.2) { color = "goodColor"; } else
+    if (battles < 1.5) { color = "greatColor"; } else {
+      color = "superUnicumColor";
+    }
+    return color;
+  }
+
+  const getDmgGroupColor = (battles) => {
+    var color = "";     
+    if (battles < 15000) { color = "badColor"; } else
+    if (battles < 25000) { color = "belowAverageColor"; } else
+    if (battles < 35000) { color = "averageColor"; } else
+    if (battles < 39000) { color = "goodColor"; } else
+    if (battles < 48000) { color = "greatColor"; } else {
+      color = "superUnicumColor";
+    }
+    return color;
+  }
+
+  const getBattlesGroupColor = (battles) => {
+    //44k is purple
+    var color = "";     
+    if (battles < 3000) { color = "badColor"; } else
+    if (battles < 5000) { color = "belowAverageColor"; } else
+    if (battles < 9000) { color = "averageColor"; } else
+    if (battles < 14000) { color = "goodColor"; } else
+    if (battles < 20000) { color = "greatColor"; } else {
+      color = "superUnicumColor";
+    }
+    return color;
+  }
+
+  const getWrGroupColor = (wr) => {
+    var color = "";     
+    if (wr < 47) { color = "badColor"; } else
+    if (wr < 50) { color = "belowAverageColor"; } else
+    if (wr < 52) { color = "averageColor"; } else
+    if (wr < 54) { color = "goodColor"; } else
+    if (wr < 56) { color = "veryGoodColor"; } else
+    if (wr < 60) { color = "greatColor"; } else
+    if (wr < 65) { color = "unicumColor"; } else {
+      color = "superUnicumColor";
+    }
+    return color;
   }
 
   const getPrGroupColor = (pr) => {
@@ -238,14 +318,14 @@ const Roster = () => {
     // Unicum 	2100 - 2450
     // Super Unicum 	2450 - 9999 
     var color = "";
-    if (pr < 751) { color = "badPrColor"; } else              //Bad
-    if (pr < 1101) { color = "belowAveragePrColor"; } else    //Below Average
-    if (pr < 1351) { color = "averagePrColor"; } else         //Average
-    if (pr < 1551) { color = "goodPrColor"; } else            //Good
-    if (pr < 1751) { color = "veryGoodPrColor"; } else        //Very Good
-    if (pr < 2101) { color = "greatPrColor"; } else           //Great
-    if (pr < 2451) { color = "unicumPrColor"; } else {        //Unicum
-      color = "superUnicumPrColor";                           //Super Unicum
+    if (pr < 751) { color = "badColor"; } else
+    if (pr < 1101) { color = "belowAverageColor"; } else
+    if (pr < 1351) { color = "averageColor"; } else
+    if (pr < 1551) { color = "goodColor"; } else
+    if (pr < 1751) { color = "veryGoodColor"; } else
+    if (pr < 2101) { color = "greatColor"; } else
+    if (pr < 2451) { color = "unicumColor"; } else {
+      color = "superUnicumColor";
     }
 
     return color;
@@ -280,7 +360,7 @@ const Roster = () => {
   return (
     <Fragment>
       <Grid container spacing={3}>
-        <Grid item xs={7}>
+        <Grid item xs={9}>
           <MaUTable {...getTableProps()}>
             <TableHead>
               {headerGroups.map(headerGroup => (
@@ -311,8 +391,11 @@ const Roster = () => {
             </TableBody>
           </MaUTable>
         </Grid>
-        <Grid item xs={5}>
-          <Box pl={5}>
+        <Grid item xs={3}>
+          <Box pl={2}>
+            <Typography variant="h6" class="MuiTab-textColorPrimary" gutterBottom>
+              Build Your Team
+            </Typography>
             <Grid container direction="row" alignItems="left">
               <Grid item>
                 <Autocomplete
@@ -329,8 +412,8 @@ const Roster = () => {
                 />
               </Grid>
               <Grid item> 
-                <Box pl={2}>
-                  <Button style={{ height: 54 }} variant="contained" color="primary" onClick={clearPlayerEventHandler}>Clear Players List</Button>
+                <Box pl={1}>
+                  <Button style={{ height: 54 }} variant="contained" color="primary" onClick={clearPlayerEventHandler}>Clear</Button>
                 </Box>
               </Grid>
             </Grid>
