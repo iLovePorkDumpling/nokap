@@ -5,7 +5,7 @@ import { useTable } from "react-table";
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
 import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
-import ExpectedShipData from '../configdata/shipsexpecteddata.json';
+// import ExpectedShipData from '../configdata/shipsexpecteddata.json';
 
 //CSS
 import MaUTable from '@material-ui/core/Table'
@@ -28,68 +28,39 @@ const Roster = () => {
   const [searchablePlayers, setSearchablePlayers] = useState([]);
   const [addedPlayers, setAddedPlayers] = React.useState([]);
   const [shipsData, setShipsData] = useState([]);
+  const [expectedShipsData, setExpectedShipsData] = useState([]);
+
+  // useEffect(() => {
+  //   import(`../configdata/shipsexpecteddata.json`).then(data => setExpectedShipsData(data));
+  //   prepareData();
+  // }, []);
+
 
   useEffect(() => {
-    prepareData();
-  }, []);
+    const loadData = async () => {
+      const expectedData = await import(`../configdata/shipsexpecteddata.json`)
+                              .then(result => {
+                                setExpectedShipsData(result.default.data);
+                                getAccountPrXp(result.default.data);
+                                prepareData();
+                              });
+      
+    }
+    loadData();
+  }, [])
 
   const prepareData = async () => {
     await setShipsData(ShipsData);
-    setAllData(NokapMembersData);
-    setData(NokapMembersData);
+
+    // setAllData(NokapMembersData);
+    // setData(NokapMembersData);
+
     const searchable = [];
     NokapMembersData.forEach((player) => {
       searchable.push(player.nickname);
     });
     setSearchablePlayers(searchable);
-    getAccountWrDmgFrag();
-  }
-
-  const roundToTwoDecimal = (num) => {
-    return Math.round(num * 100) / 100;
-  }
-
-  const getAccountWrDmgFrag = () => {
-    const newData = [];
-    var battles = 0;
-    var wr = 0;
-    var avgDmg = 0;
-    var avgFrags = 0;
-    NokapMembersData.forEach((player) => {
-      if (player.statistics != undefined) {
-        const stats = JSON.parse(player.statistics);
-        battles = stats.pvp.battles;
-        if  (battles != 0) {
-          wr = roundToTwoDecimal((stats.pvp.wins / battles) * 100);
-          avgDmg = (stats.pvp.damage_dealt/battles).toFixed(0);
-          avgFrags = roundToTwoDecimal(stats.pvp.frags/battles);
-        } else {
-          wr = 0;
-          avgDmg = 0;
-          avgFrags = 0;
-        }
-      }
-
-      const newitem = {
-        id: player.id,
-        nickname: player.nickname,
-        statistics: player.statistics,
-        battles: battles,
-        wr: wr,
-        dmg: avgDmg,
-        avgFrags: avgFrags,
-        ships_data: player.ships_data,
-        ship_names: player.ship_names
-      };
-
-      console.log(newitem);
-      newData.push(newitem);
-
-    });
-
-    setData (newData);
-    setAllData(newData);
-
+    
   }
 
   const columns = React.useMemo(
@@ -109,20 +80,12 @@ const Roster = () => {
         show: false,
       },
       {
-        Header: 'Battles',
-        accessor: 'battles',
+        Header: 'PR',
+        accessor: 'pr',
       },
       {
-        Header: 'WR',
-        accessor: 'wr',
-      },
-      {
-        Header: 'Damage',
-        accessor: 'dmg',
-      },
-      {
-        Header: 'Avg. Frags',
-        accessor: 'avgFrags',
+        Header: 'XP',
+        accessor: 'xp',
       },
       {
         Header: 'Ships Data',
@@ -176,7 +139,7 @@ const Roster = () => {
             const shipData = playerShipsData[i];
             if (shipData != undefined && shipsData[shipData.ship_id] && shipsData[shipData.ship_id].tier === 6) {
               const shipName = shipsData[shipData.ship_id].name;
-              const pr = getPR(shipData.ship_id, shipData.pvp.battles, shipData.pvp.wins, shipData.pvp.frags, shipData.pvp.damage_dealt);
+              const pr = getShipPR(shipData.ship_id, shipData.pvp.battles, shipData.pvp.wins, shipData.pvp.frags, shipData.pvp.damage_dealt);
               var colorGroup = getPrGroupColor(pr);
               var style = "";
               var topGroup = 0;
@@ -236,76 +199,17 @@ const Roster = () => {
           <ShipsList shipsList={greyShips} /><br/>
         </div>
       );
-    } else if (cell.column.id === "wr") {
-      const color = getWrGroupColor(cell.row.values.wr);
+    } else if (cell.column.id === "pr") {
+      const color = getPrGroupColor(cell.row.values.pr);
       const style = { fontWeight: 'bold'};
-      return (<span class={color} style={style}>{cell.row.values.wr}</span>);
-    } else if (cell.column.id === "battles") {
-      const color = getBattlesGroupColor(cell.row.values.battles);
+      return (<span class={color} style={style}>{cell.row.values.pr}</span>);
+    } else if (cell.column.id === "xp") {
+      const color = getXpGroupColor(cell.row.values.xp);
       const style = { fontWeight: 'bold'};
-      return (<span class={color} style={style}>{cell.row.values.battles}</span>);
-    } else if (cell.column.id === "dmg") {
-      const color = getDmgGroupColor(cell.row.values.dmg);
-      const style = { fontWeight: 'bold'};
-      return (<span class={color} style={style}>{cell.row.values.dmg}</span>);
-    } else if (cell.column.id === "avgFrags") {
-      const color = getAvgFragsGroupColor(cell.row.values.avgFrags);
-      const style = { fontWeight: 'bold'};
-      return (<span class={color} style={style}>{cell.row.values.avgFrags}</span>);
+      return (<span class={color} style={style}>{cell.row.values.xp}</span>);
     } else {
       return cell.render('Cell');
     }
-  }
-
-  const getAvgFragsGroupColor = (battles) => {
-    var color = "";     
-    if (battles < 0.55) { color = "badColor"; } else
-    if (battles < 0.7) { color = "belowAverageColor"; } else
-    if (battles < 0.9) { color = "averageColor"; } else
-    if (battles < 1.2) { color = "goodColor"; } else
-    if (battles < 1.5) { color = "greatColor"; } else {
-      color = "superUnicumColor";
-    }
-    return color;
-  }
-
-  const getDmgGroupColor = (battles) => {
-    var color = "";     
-    if (battles < 15000) { color = "badColor"; } else
-    if (battles < 25000) { color = "belowAverageColor"; } else
-    if (battles < 35000) { color = "averageColor"; } else
-    if (battles < 39000) { color = "goodColor"; } else
-    if (battles < 48000) { color = "greatColor"; } else {
-      color = "superUnicumColor";
-    }
-    return color;
-  }
-
-  const getBattlesGroupColor = (battles) => {
-    //44k is purple
-    var color = "";     
-    if (battles < 3000) { color = "badColor"; } else
-    if (battles < 5000) { color = "belowAverageColor"; } else
-    if (battles < 9000) { color = "averageColor"; } else
-    if (battles < 14000) { color = "goodColor"; } else
-    if (battles < 20000) { color = "greatColor"; } else {
-      color = "superUnicumColor";
-    }
-    return color;
-  }
-
-  const getWrGroupColor = (wr) => {
-    var color = "";     
-    if (wr < 47) { color = "badColor"; } else
-    if (wr < 50) { color = "belowAverageColor"; } else
-    if (wr < 52) { color = "averageColor"; } else
-    if (wr < 54) { color = "goodColor"; } else
-    if (wr < 56) { color = "veryGoodColor"; } else
-    if (wr < 60) { color = "greatColor"; } else
-    if (wr < 65) { color = "unicumColor"; } else {
-      color = "superUnicumColor";
-    }
-    return color;
   }
 
   const getPrGroupColor = (pr) => {
@@ -331,15 +235,156 @@ const Roster = () => {
     return color;
   }
 
-  const getPR = (shipId, battles, wins, frags, dmg) => {
+  const getXpGroupColor = (wr) => {
+    var color = "";     
+    if (wr < 47) { color = "badColor"; } else
+    if (wr < 50) { color = "belowAverageColor"; } else
+    if (wr < 52) { color = "averageColor"; } else
+    if (wr < 54) { color = "goodColor"; } else
+    if (wr < 56) { color = "veryGoodColor"; } else
+    if (wr < 60) { color = "greatColor"; } else
+    if (wr < 65) { color = "unicumColor"; } else {
+      color = "superUnicumColor";
+    }
+    return color;
+  }
+
+  // const switchRentalvsRealShipId = (shipId) => {
+  //   //Need to find unique
+  //   switch(shipId) {
+  //     case 3340645840:
+  //       return ;
+  //     case 3337500656:
+  //       return ;
+  //     case 3315513040:
+  //       return ;
+  //     case 3332323024:
+  //       return ;
+  //     case 3340678960:
+  //       return ;
+  //     case 3315513040:
+  //       return ;               
+  //     case 3337500656:
+  //       return ;
+  //     case 3315513040:
+  //       return ;
+  //     case :
+  //       return ;
+  //     case :
+  //       return ;
+  //     case :
+  //       return ;
+  //     case :
+  //       return ;
+  //     default:
+  //       // code block
+  //   }
+  // }
+
+  const getAccountPrXp = (expectedData) => {
+    const newData = [];
+    var newitem;
+
+    var accountXp = 0;
+    var accountStats;
+
+    var ship_id = 0;
+    var battles = 0;
+    
+    var actualDmg = 0;
+    var actualWins = 0;
+    var actualFrags = 0;
+
+    var expectedDmg = 0;
+    var expectedWins = 0;
+    var expectedFrags = 0;
+
+    //Ratios
+    var rDmg = 0;
+    var rWins = 0;
+    var rFrags = 0;
+
+    //Normalization
+    var nDmg = 0;
+    var nFrags = 0;
+    var nWins = 0;
+
+    var accountPr = 0;
+
+    NokapMembersData.forEach((player) => {
+      accountStats = JSON.parse(player.statistics);
+      if (accountStats.pvp != undefined) {
+
+        //Get Account XP
+        accountXp = accountStats.pvp.xp/accountStats.pvp.battles;
+
+        //Calculate Account PR
+        if (player.ships_data != undefined) {
+          const shipsData = JSON.parse(player.ships_data);
+          if (shipsData != undefined) {
+            shipsData.forEach((ship) => {
+              ship_id = ship.ship_id;
+              battles = ship.pvp.battles;
+
+              if  (expectedData[ship_id] != undefined) {
+                actualDmg =+ ship.pvp.damage_dealt;
+                actualWins =+ (ship.pvp.wins/battles)*100;
+                actualFrags =+ ship.pvp.frags/battles;
+
+                expectedDmg =+ battles*expectedData[ship_id].average_damage_dealt;
+                expectedWins =+ battles*expectedData[ship_id].win_rate;
+                expectedFrags =+ battles*expectedData[ship_id].average_frags;
+                
+              } else {
+                console.log(ship_id);
+                debugger;
+              }
+            });
+
+            rDmg = actualDmg/expectedDmg;
+            rFrags = actualFrags/expectedFrags;
+            rWins = actualWins/expectedWins;
+
+            nDmg = Math.max(0, (rDmg - 0.4) / (1 - 0.4));
+            nFrags = Math.max(0, (rFrags - 0.1) / (1 - 0.1));
+            nWins = Math.max(0, (rWins - 0.7) / (1 - 0.7));
+            accountPr =  700*nDmg + 300*nFrags + 150*nWins;
+
+          }
+        } else {
+          accountPr = 0;
+        }
+      }
+
+      //create new item with Account PR and Account XP and push the newdata.
+      newitem = {
+        id: player.id,
+        nickname: player.nickname,
+        statistics: player.statistics,
+        pr: accountPr,
+        xp: accountXp,
+        ships_data: player.ships_data,
+        ship_names: player.ship_names
+      };
+
+      newData.push(newitem);
+
+    });
+
+    setData (newData);
+    setAllData(newData);
+
+  }
+
+  const getShipPR = (shipId, battles, wins, frags, dmg) => {
     //Preparing data to calculate
     const actualDmg = dmg/battles;
     const actualWins = (wins/battles)*100;
     const actualFrags = frags/battles;
 
-    const expectedDmg = ExpectedShipData.data[shipId].average_damage_dealt;
-    const expectedWins = ExpectedShipData.data[shipId].win_rate;
-    const expectedFrags = ExpectedShipData.data[shipId].average_frags;
+    const expectedDmg = expectedShipsData[shipId].average_damage_dealt;
+    const expectedWins = expectedShipsData[shipId].win_rate;
+    const expectedFrags = expectedShipsData[shipId].average_frags;
 
     //Ratios
     const rDmg = actualDmg/expectedDmg;
@@ -347,9 +392,9 @@ const Roster = () => {
     const rFrags = actualFrags/expectedFrags;
 
     //Normalization
-    const nDmg = Math.max(0, (rDmg - 0.4) / (1 - 0.4))
-    const nFrags = Math.max(0, (rFrags - 0.1) / (1 - 0.1))
-    const nWins = Math.max(0, (rWins - 0.7) / (1 - 0.7))
+    const nDmg = Math.max(0, (rDmg - 0.4) / (1 - 0.4));
+    const nFrags = Math.max(0, (rFrags - 0.1) / (1 - 0.1));
+    const nWins = Math.max(0, (rWins - 0.7) / (1 - 0.7));
 
     const pr = 700*nDmg + 300*nFrags + 150*nWins;
 
