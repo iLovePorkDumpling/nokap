@@ -1,12 +1,12 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { useTable } from "react-table";
+import { useTable, useSortBy } from "react-table";
 
 //Data
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
 import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
-import RentalShipidsReplacement from '../configdata/rentalshipidsreplacement.json';
-import ExpectedShipsData from '../configdata/expectedshipsdata.json';
+// import RentalShipidsReplacement from '../configdata/rentalshipidsreplacement.json';
+// import ExpectedShipsData from '../configdata/expectedshipsdata.json';
 
 //CSS
 import MaUTable from '@material-ui/core/Table'
@@ -32,7 +32,7 @@ const Roster = () => {
   const [allData, setAllData] = useState([]);
   const [expectedShipsData, setExpectedShipsData] = useState([]);
   const [shipsData, setShipsData] = useState([]);
-  const [rentalShipidsReplacement, setRentalShipidsReplacement] = useState([]);
+  // const [rentalShipidsReplacement, setRentalShipidsReplacement] = useState([]);
   const [recommendedT6Ships, setRecommendedT6Ships] = useState([]);
 
   const RentalShipIdsReplacement = {
@@ -109,7 +109,7 @@ const Roster = () => {
                               .then(result => {
                                 setExpectedShipsData(result.default.data);
                                 prepareData();
-                                getAccountPrXp(result.default.data);    //Confirmed, got data here
+                                getAccountWrPrXpDmg(result.default.data);
                               });
     }
     loadData();
@@ -117,6 +117,7 @@ const Roster = () => {
 
   const prepareData = async () => {
     await setShipsData(ShipsData);
+    await setRecommendedT6Ships(RecommendedT6Ships);
     // setAllData(NokapMembersData);
     // setData(NokapMembersData);
     const searchable = [];
@@ -143,12 +144,22 @@ const Roster = () => {
         show: false,
       },
       {
+        Header: 'WR',
+        accessor: 'wr',
+      },
+      {
         Header: 'PR',
         accessor: 'pr',
+        show: false,
       },
       {
         Header: 'XP',
         accessor: 'xp',
+      },
+      {
+        Header: 'DMG',
+        accessor: 'dmg',
+        show: false,
       },
       {
         Header: 'Ships Data',
@@ -161,21 +172,30 @@ const Roster = () => {
       },
     ], []);
 
+  const defaultSorted = React.useMemo(
+    () => [
+      {
+        id: 'xp',
+        desc: false,
+      },
+    ], []);
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-    setHiddenColumns,
   } = useTable({
     columns,
     data,
+    defaultSorted,
     initialState: {
       hiddenColumns: columns.map(column => {
           if (column.show === false) return column.accessor || column.id;
       }),
-  },
+    },
+    useSortBy
   });
 
   const filterPlayers = () => {
@@ -222,7 +242,7 @@ const Roster = () => {
               }
 
               const newItem = { 
-                                shipName: shipName,
+                                shipName: shipName + "(" + shipData.pvp.battles + ")",
                                 colorGroup: colorGroup,
                                 pr: pr,
                                 style: style,
@@ -270,6 +290,10 @@ const Roster = () => {
       const color = getXpGroupColor(cell.row.values.xp);
       const style = { fontWeight: 'bold'};
       return (<span class={color} style={style}>{cell.row.values.xp}</span>);
+    } else if (cell.column.id === "wr") {
+      const color = getWrGroupColor(cell.row.values.wr);
+      const style = { fontWeight: 'bold'};
+      return (<span class={color} style={style}>{cell.row.values.wr}%</span>);
     } else {
       return cell.render('Cell');
     }
@@ -298,7 +322,21 @@ const Roster = () => {
     return color;
   }
 
-  const getXpGroupColor = (wr) => {
+  const getXpGroupColor = (xp) => {
+    var color = "";     
+    if (xp < 550) { color = "badColor"; } else
+    if (xp < 1100) { color = "belowAverageColor"; } else
+    if (xp < 1350) { color = "averageColor"; } else
+    if (xp < 1550) { color = "goodColor"; } else
+    if (xp < 1750) { color = "veryGoodColor"; } else
+    if (xp < 2100) { color = "greatColor"; } else
+    if (xp < 2450) { color = "unicumColor"; } else {  //
+      color = "superUnicumColor";
+    }
+    return color;
+  }
+
+  const getWrGroupColor = (wr) => {
     var color = "";     
     if (wr < 47) { color = "badColor"; } else
     if (wr < 50) { color = "belowAverageColor"; } else
@@ -316,11 +354,14 @@ const Roster = () => {
     return RentalShipIdsReplacement[shipId].real_id;
   }
 
-  const getAccountPrXp = (expectedshipsdata) => {
+  const getAccountWrPrXpDmg = (expectedshipsdata) => {
     const newData = [];
     var newitem;
 
+    var accountWr = 0;
+    var accountPr = 0;
     var accountXp = 0;
+    var accountDmg = 0;
     var accountStats;
 
     var ship_id = 0;
@@ -344,59 +385,72 @@ const Roster = () => {
     var nFrags = 0;
     var nWins = 0;
 
-    var accountPr = 0;
-
     NokapMembersData.forEach((player) => {
       accountStats = JSON.parse(player.statistics);
       if (accountStats.pvp != undefined) {
 
         //Get Account XP
-        accountXp = accountStats.pvp.xp/accountStats.pvp.battles;
+        if (accountStats.pvp.battles != 0) {
+          accountXp = accountStats.pvp.xp/accountStats.pvp.battles;
+          accountWr = ((accountStats.pvp.wins/accountStats.pvp.battles)*100).toFixed(2);
+          accountDmg = Math.round(accountStats.pvp.damage_dealt/accountStats.pvp.battles);
+        } else {
+          accountXp = 0;
+          accountWr = "0%"
+          accountDmg = 0;
+        }
 
         //Calculate Account PR
-        if (player.ships_data != undefined) {
-          const shipsData = JSON.parse(player.ships_data);
-          if (shipsData != undefined) {
-            shipsData.forEach((ship) => {
-              ship_id = ship.ship_id;
-              battles = ship.pvp.battles;
+        // if (player.ships_data != undefined) {
+        //   const shipsData = JSON.parse(player.ships_data);
+        //   if (shipsData != undefined) {
+        //     shipsData.forEach((ship) => {
+        //       ship_id = ship.ship_id;
+        //       battles = ship.pvp.battles;
 
-              if  (expectedshipsdata[ship_id] == undefined) {
-                ship_id = replaceRentalShipIdWithRealShipId(ship_id)
-              }
+        //       if (battles > 0) {
 
-              actualDmg =+ ship.pvp.damage_dealt;
-              actualWins =+ (ship.pvp.wins/battles)*100;
-              actualFrags =+ ship.pvp.frags/battles;
+        //         if  (expectedshipsdata[ship_id] == undefined) {
+        //           ship_id = replaceRentalShipIdWithRealShipId(ship_id)
+        //         }
 
-              expectedDmg =+ battles*expectedshipsdata[ship_id].average_damage_dealt;
-              expectedWins =+ battles*expectedshipsdata[ship_id].win_rate;
-              expectedFrags =+ battles*expectedshipsdata[ship_id].average_frags;
+        //         actualDmg =+ ship.pvp.damage_dealt;
+        //         actualWins =+ (ship.pvp.wins/battles)*100;
+        //         actualFrags =+ ship.pvp.frags/battles;
+
+        //         expectedDmg =+ battles*expectedshipsdata[ship_id].average_damage_dealt;
+        //         expectedWins =+ battles*expectedshipsdata[ship_id].win_rate;
+        //         expectedFrags =+ battles*expectedshipsdata[ship_id].average_frags;
+        //       }
                 
-            });
+        //     });
 
-            rDmg = actualDmg/expectedDmg;
-            rFrags = actualFrags/expectedFrags;
-            rWins = actualWins/expectedWins;
+        //     rDmg = actualDmg/expectedDmg;
+        //     rFrags = actualFrags/expectedFrags;
+        //     rWins = actualWins/expectedWins;
 
-            nDmg = Math.max(0, (rDmg - 0.4) / (1 - 0.4));
-            nFrags = Math.max(0, (rFrags - 0.1) / (1 - 0.1));
-            nWins = Math.max(0, (rWins - 0.7) / (1 - 0.7));
-            accountPr =  700*nDmg + 300*nFrags + 150*nWins;
+        //     nDmg = Math.max(0, (rDmg - 0.4) / (1 - 0.4));
+        //     nFrags = Math.max(0, (rFrags - 0.1) / (1 - 0.1));
+        //     nWins = Math.max(0, (rWins - 0.7) / (1 - 0.7));
+        //     accountPr =  700*nDmg + 300*nFrags + 150*nWins;
 
-          }
-        } else {
-          accountPr = 0;
-        }
+        //   }
+        // } else {
+        //   accountPr = 0;
+        // }
       }
+
+      accountPr = 0;
 
       //create new item with Account PR and Account XP and push the newdata.
       newitem = {
         id: player.id,
         nickname: player.nickname,
         statistics: player.statistics,
-        pr: accountPr,
-        xp: accountXp,
+        wr: accountWr,
+        pr: Math.round(accountPr),
+        xp: Math.round(accountXp),
+        dmg: accountDmg,
         ships_data: player.ships_data,
         ship_names: player.ship_names
       };
@@ -439,7 +493,7 @@ const Roster = () => {
   return (
     <Fragment>
       <Grid container spacing={3}>
-        <Grid item xs={9}>
+        <Grid item xs={6}>
           <MaUTable {...getTableProps()}>
             <TableHead>
               {headerGroups.map(headerGroup => (
