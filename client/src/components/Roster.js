@@ -19,6 +19,8 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import "./Roster.css";
 
@@ -194,9 +196,16 @@ const Roster = () => {
       hiddenColumns: columns.map(column => {
           if (column.show === false) return column.accessor || column.id;
       }),
-    },
-    useSortBy
-  });
+      sortBy: [
+        {
+            id: 'xp',
+            desc: true
+        }
+      ]
+    },    
+  },
+  useSortBy,
+  );
 
   const filterPlayers = () => {
     var filteredData = allData.filter(function(itm){
@@ -499,9 +508,12 @@ const Roster = () => {
               {headerGroups.map(headerGroup => (
                 <TableRow {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map(column => (
-                    <TableCell {...column.getHeaderProps()}>
+                    <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                       {column.render('Header')}
-                    </TableCell>
+                      <span>
+                        {column.isSorted ? (column.isSortedDesc ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />) : ''}
+                      </span>
+                    </th>
                   ))}
                 </TableRow>
               ))}
