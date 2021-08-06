@@ -260,6 +260,11 @@ const Roster = () => {
     setAddedPlayers([]);
   }
 
+  const handleClickShipName = (event) => {
+    console.log(event.target.textContent);
+    
+  }
+
   const ListAddedPlayers = () => addedPlayers.map(player => (<Typography variant="body2" component="p">{player}<br/><br/></Typography>));
  
   const renderCell = (cell) => {
@@ -320,7 +325,7 @@ const Roster = () => {
       const ShipsList = ({shipsList}) => (
         <>
           {shipsList.map(ship => (
-            <span class={ship.colorGroup} key={ship.shipName} style={ship.style}>{ship.shipName}&ensp;&ensp;&ensp;</span>
+            <span class={ship.colorGroup} onClick={handleClickShipName} key={ship.shipName} style={ship.style}>{ship.shipName}&ensp;&ensp;&ensp;</span>
           ))}
         </>
       ); 
