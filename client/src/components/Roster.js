@@ -643,7 +643,7 @@ const Roster = () => {
                             </Box>
                             <Grid item>
                               <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
-                                PR: <span class={getPrGroupColor(avgPlayersPr)} >{Math.round(avgPlayersPr)}</span>
+                                PR: Soon!
                               </Typography>
                             </Grid>
                           </Grid>
