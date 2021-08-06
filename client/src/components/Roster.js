@@ -258,6 +258,10 @@ const Roster = () => {
   const clearPlayerEventHandler= () => {
     setData(allData);
     setAddedPlayers([]);
+    setAvgPlayersWr(0);
+    setAvgPlayersPr(0);
+    setAvgPlayersXp(0);
+    setAvgPlayersDmg(0);
   }
 
   const handleClickShipName = (event) => {
@@ -585,7 +589,7 @@ const Roster = () => {
   return (
     <Fragment>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={8}>
           <MaUTable {...getTableProps()}>
             <TableHead>
               {headerGroups.map(headerGroup => (
@@ -620,7 +624,7 @@ const Roster = () => {
           </MaUTable>
         </Grid>
         <Grid item xs={4}>
-          <Box pl={10}>
+          <Box pl={6}>
             <Card variant="outlined">
               <CardContent>
                   <Box pb={3} align="center">
