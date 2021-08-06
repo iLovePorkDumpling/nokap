@@ -396,7 +396,7 @@ const Roster = () => {
           accountDmg = Math.round(accountStats.pvp.damage_dealt/accountStats.pvp.battles);
         } else {
           accountXp = 0;
-          accountWr = "0%"
+          accountWr = 0;
           accountDmg = 0;
         }
 
