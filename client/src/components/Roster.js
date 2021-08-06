@@ -18,6 +18,8 @@ import { Divider, Grid } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
@@ -36,6 +38,11 @@ const Roster = () => {
   const [shipsData, setShipsData] = useState([]);
   // const [rentalShipidsReplacement, setRentalShipidsReplacement] = useState([]);
   const [recommendedT6Ships, setRecommendedT6Ships] = useState([]);
+
+  const [avgPlayersWr, setAvgPlayersWr] = useState(0);
+  const [avgPlayersPr, setAvgPlayersPr] = useState(0);
+  const [avgPlayersXp, setAvgPlayersXp] = useState(0);
+  const [avgPlayersDmg, setAvgPlayersDmg] = useState(0);
 
   const RentalShipIdsReplacement = {
                                       "3315513040":
@@ -212,6 +219,40 @@ const Roster = () => {
       return addedPlayers.indexOf(itm.nickname) > -1;
     });
     setData(filteredData);
+    calculateTeamPlayersStats(filteredData);
+  }
+
+  const calculateTeamPlayersStats = (players) => {
+    var wr = 0;
+    var pr = 0;
+    var xp = 0;
+    var dmg = 0;
+    var name = "";
+    players.forEach((player) => {
+      name = player.nickname;
+
+      for (var i = 0; i < allData.length; i++) {
+        if (allData[i].nickname === name) {
+          wr = wr + parseFloat(allData[i].wr);
+          console.log(wr);
+          pr = pr + allData[i].pr;
+          xp = xp + allData[i].xp;
+          dmg = dmg + allData[i].dmg;
+        }
+      }
+    });
+
+    const numberOfPlayersInTeam = players.length;
+    if (numberOfPlayersInTeam > 0) {
+      setAvgPlayersWr(wr/numberOfPlayersInTeam);
+      setAvgPlayersPr(pr/numberOfPlayersInTeam);
+      setAvgPlayersXp(xp/numberOfPlayersInTeam);
+      setAvgPlayersDmg(dmg/numberOfPlayersInTeam);
+    }
+  }
+
+  const calculateTeamShipsStats = () => {
+    
   }
 
   const clearPlayerEventHandler= () => {
@@ -359,6 +400,43 @@ const Roster = () => {
     return color;
   }
 
+  const getDmgGroupColor = (dmg) => {
+    var color = "";     
+    if (dmg < 15000) { color = "badColor"; } else
+    if (dmg < 25000) { color = "belowAverageColor"; } else
+    if (dmg < 35000) { color = "averageColor"; } else
+    if (dmg < 39000) { color = "goodColor"; } else
+    if (dmg < 48000) { color = "greatColor"; } else {
+      color = "superUnicumColor";
+    }
+    return color;
+  }
+
+  const getAvgFragsGroupColor = (avgFrags) => {
+    var color = "";     
+    if (avgFrags < 0.55) { color = "badColor"; } else
+    if (avgFrags < 0.7) { color = "belowAverageColor"; } else
+    if (avgFrags < 0.9) { color = "averageColor"; } else
+    if (avgFrags < 1.2) { color = "goodColor"; } else
+    if (avgFrags < 1.5) { color = "greatColor"; } else {
+      color = "superUnicumColor";
+    }
+    return color;
+  }
+
+  // const getBattlesGroupColor = (battles) => {
+  //   //44k is purple
+  //   var color = "";     
+  //   if (battles < 3000) { color = "badColor"; } else
+  //   if (battles < 5000) { color = "belowAverageColor"; } else
+  //   if (battles < 9000) { color = "averageColor"; } else
+  //   if (battles < 14000) { color = "goodColor"; } else
+  //   if (battles < 20000) { color = "greatColor"; } else {
+  //     color = "superUnicumColor";
+  //   }
+  //   return color;
+  // }
+
   const replaceRentalShipIdWithRealShipId = (shipId) => {
     return RentalShipIdsReplacement[shipId].real_id;
   }
@@ -502,7 +580,7 @@ const Roster = () => {
   return (
     <Fragment>
       <Grid container spacing={3}>
-        <Grid item xs={9}>
+        <Grid item xs={6}>
           <MaUTable {...getTableProps()}>
             <TableHead>
               {headerGroups.map(headerGroup => (
@@ -536,35 +614,132 @@ const Roster = () => {
             </TableBody>
           </MaUTable>
         </Grid>
-        <Grid item xs={3}>
-          <Box pl={2}>
-            <Typography variant="h6" class="MuiTab-textColorPrimary" gutterBottom>
-              Build Your Team
-            </Typography>
-            <Grid container direction="row" alignItems="left">
-              <Grid item>
-                <Autocomplete
-                  value=""
-                  onChange={(event, newValue) => {
-                    if (newValue != null) {
-                    addedPlayers.push(newValue);
-                    filterPlayers();
-                  }}}
-                  options={searchablePlayers}
-                  getOptionLabel={(option) => option}
-                  style={{ width: 300 }}
-                  renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
-                />
-              </Grid>
-              <Grid item> 
-                <Box pl={1}>
-                  <Button style={{ height: 54 }} variant="contained" color="primary" onClick={clearPlayerEventHandler}>Clear</Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-          <Box pt={3} pl={5}>
-            <ListAddedPlayers />
+        <Grid item xs={4}>
+          <Box pl={10}>
+            <Card variant="outlined">
+              <CardContent>
+                  <Box pb={3} align="center">
+                    <Typography variant="h5" gutterBottom>
+                      Your Team
+                    </Typography>
+                  </Box>
+                  <Grid container direction="row" alignItems="left">
+                    <Box pl={3} pr={3} width="50%">
+                      <Grid item>
+                        <Card variant="outlined">
+                          <CardContent>
+                            <Box align="center">
+                              <Typography variant="body2" class="MuiTab-textColorPrimary" align="center">
+                                Avg. Player Stats
+                              </Typography>
+                            </Box>
+                          <Grid container direction="row" alignItems="left">
+                            <Box width="50%">
+                            <Grid item>
+                              <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                WR: <span class={getWrGroupColor(avgPlayersWr)} >{avgPlayersWr.toFixed(2)}%</span>
+                              </Typography>
+                            </Grid>
+                            </Box>
+                            <Grid item>
+                              <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                PR: <span class={getPrGroupColor(avgPlayersPr)} >{Math.round(avgPlayersPr)}</span>
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                          <Grid>
+                          <Grid container direction="row" alignItems="left">
+                            <Box width="50%">
+                              <Grid item>
+                                <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                  XP: <span class={getXpGroupColor(avgPlayersXp)} >{Math.round(avgPlayersXp)}</span>
+                                </Typography>
+                              </Grid>
+                            </Box>
+                            <Grid item>
+                              <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                Dmg: <span class={getDmgGroupColor(avgPlayersDmg)} >{Math.round(avgPlayersDmg)}</span>
+                              </Typography>
+                            </Grid>
+                            </Grid>
+                          </Grid>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    </Box>
+                    <Box pr={3} width="50%">
+                      <Grid item>
+                        <Card variant="outlined">
+                          <CardContent>
+                          <Box align="center">
+                            <Typography variant="body2" class="MuiTab-textColorPrimary" align="center">
+                              Avg. Ships Stats
+                            </Typography>
+                          </Box>
+                          <Grid container direction="row" alignItems="left">
+                            <Box width="50%">
+                            <Grid item>
+                              <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                WR: 
+                              </Typography>
+                            </Grid>
+                            </Box>
+                            <Grid item>
+                              <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                PR: 
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                          <Grid>
+                          <Grid container direction="row" alignItems="left">
+                            <Box width="50%">
+                              <Grid item>
+                                <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                  XP: 
+                                </Typography>
+                              </Grid>
+                              </Box>
+                              <Grid item>
+                                <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
+                                  Dmg: 
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <br/>
+                  <Grid container direction="row" alignItems="left">
+                    <Grid item>
+                      <Box pl={3}>
+                        <Autocomplete
+                          value=""
+                          onChange={(event, newValue) => {
+                            if (newValue != null) {
+                            addedPlayers.push(newValue);
+                            filterPlayers();
+                          }}}
+                          options={searchablePlayers}
+                          getOptionLabel={(option) => option}
+                          style={{ width: 300 }}
+                          renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item> 
+                      <Box pl={1}>
+                        <Button style={{ height: 54 }} variant="contained" color="primary" onClick={clearPlayerEventHandler}>Clear</Button>
+                      </Box>
+                    </Grid>
+                  </Grid>
+              <Box pt={3} pl={5}>
+                <ListAddedPlayers />
+              </Box>
+              </CardContent>
+            </Card>
           </Box>
         </Grid>
       </Grid>
