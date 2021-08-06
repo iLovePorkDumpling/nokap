@@ -493,7 +493,7 @@ const Roster = () => {
   return (
     <Fragment>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={9}>
           <MaUTable {...getTableProps()}>
             <TableHead>
               {headerGroups.map(headerGroup => (
