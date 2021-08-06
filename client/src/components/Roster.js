@@ -5,7 +5,8 @@ import { useTable } from "react-table";
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
 import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
-// import ExpectedShipData from '../configdata/shipsexpecteddata.json';
+import RentalShipidsReplacement from '../configdata/rentalshipidsreplacement.json';
+import ExpectedShipsData from '../configdata/expectedshipsdata.json';
 
 //CSS
 import MaUTable from '@material-ui/core/Table'
@@ -24,43 +25,105 @@ import "./Roster.css";
 const Roster = () => {
 
   const [data, setData] = useState([]);
-  const [allData, setAllData] = useState([]);
+  
   const [searchablePlayers, setSearchablePlayers] = useState([]);
   const [addedPlayers, setAddedPlayers] = React.useState([]);
-  const [shipsData, setShipsData] = useState([]);
+  
+  const [allData, setAllData] = useState([]);
   const [expectedShipsData, setExpectedShipsData] = useState([]);
+  const [shipsData, setShipsData] = useState([]);
+  const [rentalShipidsReplacement, setRentalShipidsReplacement] = useState([]);
+  const [recommendedT6Ships, setRecommendedT6Ships] = useState([]);
 
-  // useEffect(() => {
-  //   import(`../configdata/shipsexpecteddata.json`).then(data => setExpectedShipsData(data));
-  //   prepareData();
-  // }, []);
-
+  const RentalShipIdsReplacement = {
+                                      "3315513040":
+                                      {
+                                          "real_id":4259231440,
+                                          "name":"[Zaō]"
+                                      },
+                                      "3332323024":
+                                      {
+                                          "real_id":4276041424,
+                                          "name":"[Yamato]"
+                                      },
+                                      "3333371888":
+                                      {
+                                          "real_id":4277090288,
+                                          "name":"[Montana]"
+                                      },
+                                      "3333404368":
+                                      {
+                                          "real_id":4179605200,
+                                          "name":"[Hakuryū]"
+                                      },
+                                      "3335501808":
+                                      {
+                                          "real_id":4179605488,
+                                          "name":"[Midway]"
+                                      },
+                                      "3337500656":
+                                      {
+                                          "real_id":4281219056,
+                                          "name":"[Gearing]"
+                                      },
+                                      "3338548944":
+                                      {
+                                          "real_id":4282267344,
+                                          "name":"[Shimakaze]"
+                                      },
+                                      "3340645840":
+                                      {
+                                          "real_id":4074649040,
+                                          "name":"[Grozovoi]"
+                                      },
+                                      "3340678608":
+                                      {
+                                          "real_id":4179539408,
+                                          "name":"[Moskva]"
+                                      },
+                                      "3340678960":
+                                      {
+                                          "real_id":4179539760,
+                                          "name":"[Hindenburg]"
+                                      },
+                                      "3340711728":
+                                      {
+                                          "real_id":4179572528,
+                                          "name":"[Großer Kurfürst]"
+                                      },
+                                      "3340711888":
+                                      {
+                                          "real_id":4179572688,
+                                          "name":"[Conqueror]"
+                                      },
+                                      "3340744656":
+                                      {
+                                          "real_id":4074747856,
+                                          "name":"[Audacious]"
+                                      }
+                                    };
 
   useEffect(() => {
     const loadData = async () => {
-      const expectedData = await import(`../configdata/shipsexpecteddata.json`)
+      const expectedData = await import(`../configdata/expectedshipsdata`)
                               .then(result => {
                                 setExpectedShipsData(result.default.data);
-                                getAccountPrXp(result.default.data);
                                 prepareData();
+                                getAccountPrXp(result.default.data);    //Confirmed, got data here
                               });
-      
     }
     loadData();
-  }, [])
+  }, []);
 
   const prepareData = async () => {
     await setShipsData(ShipsData);
-
     // setAllData(NokapMembersData);
     // setData(NokapMembersData);
-
     const searchable = [];
     NokapMembersData.forEach((player) => {
       searchable.push(player.nickname);
     });
     setSearchablePlayers(searchable);
-    
   }
 
   const columns = React.useMemo(
@@ -144,7 +207,7 @@ const Roster = () => {
               var style = "";
               var topGroup = 0;
 
-              if (RecommendedT6Ships.indexOf(shipName) > -1) {
+              if (recommendedT6Ships.indexOf(shipName) > -1) {
                 style = { fontWeight: 'bold', fontSize: 16 };
                 topGroup = 1;
               } else {
@@ -249,39 +312,11 @@ const Roster = () => {
     return color;
   }
 
-  // const switchRentalvsRealShipId = (shipId) => {
-  //   //Need to find unique
-  //   switch(shipId) {
-  //     case 3340645840:
-  //       return ;
-  //     case 3337500656:
-  //       return ;
-  //     case 3315513040:
-  //       return ;
-  //     case 3332323024:
-  //       return ;
-  //     case 3340678960:
-  //       return ;
-  //     case 3315513040:
-  //       return ;               
-  //     case 3337500656:
-  //       return ;
-  //     case 3315513040:
-  //       return ;
-  //     case :
-  //       return ;
-  //     case :
-  //       return ;
-  //     case :
-  //       return ;
-  //     case :
-  //       return ;
-  //     default:
-  //       // code block
-  //   }
-  // }
+  const replaceRentalShipIdWithRealShipId = (shipId) => {
+    return RentalShipIdsReplacement[shipId].real_id;
+  }
 
-  const getAccountPrXp = (expectedData) => {
+  const getAccountPrXp = (expectedshipsdata) => {
     const newData = [];
     var newitem;
 
@@ -326,19 +361,18 @@ const Roster = () => {
               ship_id = ship.ship_id;
               battles = ship.pvp.battles;
 
-              if  (expectedData[ship_id] != undefined) {
-                actualDmg =+ ship.pvp.damage_dealt;
-                actualWins =+ (ship.pvp.wins/battles)*100;
-                actualFrags =+ ship.pvp.frags/battles;
-
-                expectedDmg =+ battles*expectedData[ship_id].average_damage_dealt;
-                expectedWins =+ battles*expectedData[ship_id].win_rate;
-                expectedFrags =+ battles*expectedData[ship_id].average_frags;
-                
-              } else {
-                console.log(ship_id);
-                debugger;
+              if  (expectedshipsdata[ship_id] == undefined) {
+                ship_id = replaceRentalShipIdWithRealShipId(ship_id)
               }
+
+              actualDmg =+ ship.pvp.damage_dealt;
+              actualWins =+ (ship.pvp.wins/battles)*100;
+              actualFrags =+ ship.pvp.frags/battles;
+
+              expectedDmg =+ battles*expectedshipsdata[ship_id].average_damage_dealt;
+              expectedWins =+ battles*expectedshipsdata[ship_id].win_rate;
+              expectedFrags =+ battles*expectedshipsdata[ship_id].average_frags;
+                
             });
 
             rDmg = actualDmg/expectedDmg;
