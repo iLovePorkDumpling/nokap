@@ -33,3 +33,48 @@
 .greyColor {
     color: #989898;
 }
+
+.selectedBadColor {
+    background-color: #FE0E00;
+    color: #FFFFFF;
+}
+
+.selectedBelowAverageColor {
+    background-color: #FE7903;
+    color: #FFFFFF;
+}
+
+.selectedAverageColor {
+    background-color: #FFC71F;
+    color: #FFFFFF;
+}
+
+.selectedGoodColor {
+    background-color: #44B300;
+    color: #FFFFFF;
+}
+
+.selectedVeryGoodColor {
+    background-color: #318000;
+    color: #FFFFFF;
+}
+
+.selectedGreatColor {
+    background-color: #02C9B3;
+    color: #FFFFFF;
+}
+
+.selectedUnicumColor {
+    background-color: #D042F3;
+    color: #FFFFFF;
+}
+
+.selectedSuperUnicumColor {
+    background-color: #A00DC5;
+    color: #FFFFFF;
+}
+
+.selectedGreyColor {
+    background-color: #989898;
+    color: #FFFFFF;
+}

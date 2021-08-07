@@ -1,5 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { useTable, useSortBy } from "react-table";
+import { useTable, useGlobalFilter, useSortBy } from "react-table";
+import GlobalFilter from './GlobalFilter';
 
 //Data
 import NokapMembersData from "../configdata/nokapmembersdata.json";
@@ -9,6 +10,7 @@ import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
 // import ExpectedShipsData from '../configdata/expectedshipsdata.json';
 
 //CSS
+import { makeStyles } from '@material-ui/core/styles';
 import MaUTable from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
@@ -23,6 +25,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import "./Roster.css";
 
@@ -38,11 +41,17 @@ const Roster = () => {
   const [shipsData, setShipsData] = useState([]);
   // const [rentalShipidsReplacement, setRentalShipidsReplacement] = useState([]);
   const [recommendedT6Ships, setRecommendedT6Ships] = useState([]);
+  const [teamTableData, setTeamTableData] = useState([]);
 
   const [avgPlayersWr, setAvgPlayersWr] = useState(0);
   const [avgPlayersPr, setAvgPlayersPr] = useState(0);
   const [avgPlayersXp, setAvgPlayersXp] = useState(0);
   const [avgPlayersDmg, setAvgPlayersDmg] = useState(0);
+
+  const [avgShipsWr, setAvgShipsWr] = useState(0);
+  const [avgShipsPr, setAvgShipsPr] = useState(0);
+  const [avgShipsXp, setAvgShipsXp] = useState(0);
+  const [avgShipsDmg, setAvgShipsDmg] = useState(0);
 
   const RentalShipIdsReplacement = {
                                       "3315513040":
@@ -195,6 +204,8 @@ const Roster = () => {
     headerGroups,
     rows,
     prepareRow,
+    state,
+    setGlobalFilter,
   } = useTable({
     columns,
     data,
@@ -211,16 +222,11 @@ const Roster = () => {
       ]
     },    
   },
+  useGlobalFilter,
   useSortBy,
   );
 
-  const filterPlayers = () => {
-    var filteredData = allData.filter(function(itm){
-      return addedPlayers.indexOf(itm.nickname) > -1;
-    });
-    setData(filteredData);
-    calculateTeamPlayersStats(filteredData);
-  }
+  const { globalFilter } = state
 
   const calculateTeamPlayersStats = (players) => {
     var wr = 0;
@@ -234,7 +240,6 @@ const Roster = () => {
       for (var i = 0; i < allData.length; i++) {
         if (allData[i].nickname === name) {
           wr = wr + parseFloat(allData[i].wr);
-          console.log(wr);
           pr = pr + allData[i].pr;
           xp = xp + allData[i].xp;
           dmg = dmg + allData[i].dmg;
@@ -251,25 +256,98 @@ const Roster = () => {
     }
   }
 
-  const calculateTeamShipsStats = () => {
-    
+  const calculateTeamShipsStats = (players) => {
+    var shipWr = 0;
+    var shipPr = 0;
+    var shipXp = 0;
+    var shipDmg = 0;
+    players.forEach((player) => {
+      shipWr = shipWr + parseFloat(player.shipWr);
+      shipPr = shipPr + parseInt(player.shipPr);
+      shipXp = shipXp + parseInt(player.shipXp);
+      shipDmg = shipDmg + parseInt(player.shipDmg);
+    });
+
+    const numberOfPlayersInTeam = players.length;
+    if (numberOfPlayersInTeam > 0) {
+      setAvgShipsWr(shipWr/numberOfPlayersInTeam);
+      setAvgShipsPr(shipPr/numberOfPlayersInTeam);
+      setAvgShipsXp(shipXp/numberOfPlayersInTeam);
+      setAvgShipsDmg(shipDmg/numberOfPlayersInTeam);
+    }
   }
 
   const clearPlayerEventHandler= () => {
     setData(allData);
-    setAddedPlayers([]);
+    setTeamTableData([]);
     setAvgPlayersWr(0);
     setAvgPlayersPr(0);
     setAvgPlayersXp(0);
     setAvgPlayersDmg(0);
+    setAvgShipsWr(0);
+    setAvgShipsPr(0);
+    setAvgShipsXp(0);
+    setAvgShipsDmg(0);
   }
 
   const handleClickShipName = (event) => {
-    console.log(event.target.textContent);
-    
+    if (event.target.selected == false) {
+      //Click is to select
+      switch(event.target.className) {
+        case "badColor":
+          event.target.classList.replace("badColor", "selectedBadColor");
+          break;
+        case "belowAverageColor":
+          event.target.classList.replace("belowAverageColor", "selectedBelowAverageColor");
+          break;
+        case "averageColor":
+          event.target.classList.replace("averageColor", "selectedAverageColor");
+          break;
+        case "goodColor":
+          event.target.classList.replace("goodColor", "selectedGoodColor");
+          break;
+        case "veryGoodColor":
+          event.target.classList.replace("veryGoodColor", "selectedVeryGoodColor");
+          break;
+        case "greatColor":
+          event.target.classList.replace("greatColor", "selectedGreatColor");
+          break; 
+        case "unicumColor":
+          event.target.classList.replace("unicumColor", "selectedUnicumColor");
+          break;
+        case "superUnicumColor":
+          event.target.classList.replace("superUnicumColor", "selectedSuperUnicumColor");
+          break;
+        case "greyColor":
+          event.target.classList.replace("greyColor", "selectedGreyColor");
+          break;
+        default:
+          // code block
+      }
+
+      const newitem = {
+        nickname: event.target.attributes.nickname.value,
+        ship: event.target.attributes.shipName.value,
+        shipWr: event.target.attributes.shipWr.value,
+        shipPr: event.target.attributes.shipPr.value,
+        shipXp: event.target.attributes.shipXp.value,
+        shipDmg: event.target.attributes.shipDmg.value
+      }
+
+      const original = teamTableData;
+      const newArray = original.concat(newitem);
+      setTeamTableData(newArray);
+      calculateTeamPlayersStats(newArray);
+      calculateTeamShipsStats (newArray);
+
+    } else {
+      //Click is to de-select
+    }
   }
 
-  const ListAddedPlayers = () => addedPlayers.map(player => (<Typography variant="body2" component="p">{player}<br/><br/></Typography>));
+  const handleMouseOverShipName = (event) => {
+
+  }
  
   const renderCell = (cell) => {
     if (cell.column.id === "ship_names") {
@@ -280,30 +358,44 @@ const Roster = () => {
           for (let i = 0; i < playerShipsData.length; i++) {
             const shipData = playerShipsData[i];
             if (shipData != undefined && shipsData[shipData.ship_id] && shipsData[shipData.ship_id].tier === 6) {
+              const playerId = shipData.account_id;
+              const nickname = cell.row.values.nickname;
               const shipName = shipsData[shipData.ship_id].name;
-              const pr = getShipPR(shipData.ship_id, shipData.pvp.battles, shipData.pvp.wins, shipData.pvp.frags, shipData.pvp.damage_dealt);
+              var wr = 0;
+              if (shipData.pvp.battles > 0) {
+                wr = ((shipData.pvp.wins/shipData.pvp.battles)*100).toFixed(2);
+              }
+              const pr = Math.round(getShipPR(shipData.ship_id, shipData.pvp.battles, shipData.pvp.wins, shipData.pvp.frags, shipData.pvp.damage_dealt));
+              const xp = Math.round(shipData.pvp.xp/shipData.pvp.battles);
+              const dmg = Math.round(shipData.pvp.damage_dealt/shipData.pvp.battles);
               var colorGroup = getPrGroupColor(pr);
               var style = "";
               var topGroup = 0;
 
               if (recommendedT6Ships.indexOf(shipName) > -1) {
-                style = { fontWeight: 'bold', fontSize: 16 };
+                style = { fontWeight: 'bold', fontSize: 16, cursor: 'pointer' };
                 topGroup = 1;
               } else {
-                style = { fontWeight: 'lighter', fontSize: 14 };
+                style = { fontWeight: 'lighter', fontSize: 14, cursor: 'pointer' };
                 topGroup = 0;
               }
 
               if (shipData.pvp.battles < 5) {
                 colorGroup = "greyPrColor";
-                style = { fontWeight: 'lighter', fontSize: 14 };
+                style = { fontWeight: 'lighter', fontSize: 14, cursor: 'pointer'};
                 topGroup = 0;
               }
 
               const newItem = { 
-                                shipName: shipName + "(" + shipData.pvp.battles + ")",
+                                shipName: shipName,
+                                shipBattles: shipData.pvp.battles,
                                 colorGroup: colorGroup,
-                                pr: pr,
+                                playerId: playerId,
+                                nickname: nickname,
+                                shipWr: wr,
+                                shipPr: pr,
+                                shipXp: xp,
+                                shipDmg: dmg,
                                 style: style,
                                 topGroup: topGroup
                               };
@@ -326,13 +418,30 @@ const Roster = () => {
       nonRecommendedColoredShips.sort(function(a, b) { return b.pr - a.pr; })
       greyShips.sort(function(a, b) { return b.pr - a.pr; })
 
+      const selected = false;
+
       const ShipsList = ({shipsList}) => (
         <>
           {shipsList.map(ship => (
-            <span class={ship.colorGroup} onClick={handleClickShipName} key={ship.shipName} style={ship.style}>{ship.shipName}&ensp;&ensp;&ensp;</span>
+            <span 
+              class={ship.colorGroup} 
+              selected={selected}
+              onClick={handleClickShipName}
+              onmouseover={handleMouseOverShipName}
+              playerId={ship.playerId}
+              nickname={ship.nickname}
+              shipName={ship.shipName}
+              shipBattles={ship.shipBattles}
+              shipWr={ship.shipWr}
+              shipPr={ship.shipPr}
+              shipXp={ship.shipXp}
+              shipDmg={ship.shipDmg}
+              style={ship.style}>
+                &ensp;&ensp;{ship.shipName}({ship.shipBattles })&ensp;&ensp;
+            </span>
           ))}
         </>
-      ); 
+      );
 
       return (
         <div>
@@ -353,6 +462,9 @@ const Roster = () => {
       const color = getWrGroupColor(cell.row.values.wr);
       const style = { fontWeight: 'bold'};
       return (<span class={color} style={style}>{cell.row.values.wr}%</span>);
+    } else if (cell.column.id === "nickname") {
+      style = { cursor: 'pointer'};
+      return (<span playerId={cell.row.values.id} style={style}>{cell.row.values.nickname}</span>);
     } else {
       return cell.render('Cell');
     }
@@ -585,11 +697,111 @@ const Roster = () => {
     return pr;
   }
 
+  const TeamDataTable = ({data}) => {
+    const useStyles = makeStyles({
+      table: {
+        minWidth: 500
+      },
+      tr: {
+        cursor: "pointer",
+        borderLeft: "8px solid #9a031e",
+        marginTop: "8px"
+      },
+      td: {
+        marginLeft: "8px"
+      }
+    });
+  
+    const columns = React.useMemo(
+     () => [
+       {
+         Header: '',
+         accessor: 'nickname',
+       },
+       {
+         Header: '',
+         accessor: 'ship',
+       },
+       {
+         Header: 'WR',
+         accessor: 'shipWr',
+         Cell: cellInfo => ( <span class={getWrGroupColor(parseFloat(cellInfo.cell.value))} >{cellInfo.cell.value}%</span> ) 
+       },
+       {
+         Header: 'PR',
+         accessor: 'shipPr',
+         Cell: cellInfo => ( <span class={getPrGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> )
+       },
+       {
+          Header: 'XP',
+          accessor: 'shipXp',
+          Cell: cellInfo => ( <span class={getXpGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> )
+      },
+      {
+          Header: 'Dmg',
+          accessor: 'shipDmg',
+          Cell: cellInfo => ( <span class={getDmgGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> )
+      },
+     ], []);
+  
+    const {
+      getTableProps,
+      getTableBodyProps,
+      headerGroups,
+      rows,
+      prepareRow,
+    } = useTable({
+      columns,
+      data,
+    });
+  
+    const classes = useStyles();
+  
+    return (
+      <table className={classes.table} {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row, i) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map((cell) => {
+                  // {renderTeamDataCell(cell)}
+                  return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  }
+
+  const pink = "#f48fb1";
   // Render the UI for your table
   return (
     <Fragment>
+      <span>Quick & Dirty Notes</span>
+      <ul>
+        <li>It's a work in progress. Still a prototype. I'll make it more user-friendly and beautify it later</li>
+        <li>Search by player's name or by ship name using search bar (top left of table below)</li>
+        <li>Click on player's ship name to add that to your team</li>
+        <li>You can sort by WR, or XP. Account PR is coming. Ship's PR for each player is available once you click on the ship name.</li>
+        <li>Feedback/Feature requests? Contact Fast & Curious <FavoriteIcon style={{ color: pink }} fontSize="small" /></li>
+      </ul>
       <Grid container spacing={3}>
         <Grid item xs={8}>
+          <Box align="right">
+            <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+          </Box>
           <MaUTable {...getTableProps()}>
             <TableHead>
               {headerGroups.map(headerGroup => (
@@ -689,13 +901,13 @@ const Roster = () => {
                             <Box width="50%">
                             <Grid item>
                               <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
-                                WR: 
+                                WR: <span class={getWrGroupColor(avgShipsWr)} >{avgShipsWr.toFixed(2)}%</span>
                               </Typography>
                             </Grid>
                             </Box>
                             <Grid item>
                               <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
-                                PR: 
+                                PR: <span class={getPrGroupColor(avgShipsPr)} >{Math.round(avgShipsPr)}</span>
                               </Typography>
                             </Grid>
                           </Grid>
@@ -704,13 +916,13 @@ const Roster = () => {
                             <Box width="50%">
                               <Grid item>
                                 <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
-                                  XP: 
+                                  XP: <span class={getXpGroupColor(avgShipsXp)} >{Math.round(avgShipsXp)}</span>
                                 </Typography>
                               </Grid>
                               </Box>
                               <Grid item>
                                 <Typography variant="caption" class="MuiTab-textColorPrimary" align="center">
-                                  Dmg: 
+                                  Dmg: <span class={getDmgGroupColor(avgShipsDmg)} >{Math.round(avgShipsDmg)}</span>
                                 </Typography>
                               </Grid>
                             </Grid>
@@ -721,32 +933,14 @@ const Roster = () => {
                     </Box>
                   </Grid>
                   <br/>
-                  <Grid container direction="row" alignItems="left">
-                    <Grid item>
-                      <Box pl={3}>
-                        <Autocomplete
-                          value=""
-                          onChange={(event, newValue) => {
-                            if (newValue != null) {
-                            addedPlayers.push(newValue);
-                            filterPlayers();
-                          }}}
-                          options={searchablePlayers}
-                          getOptionLabel={(option) => option}
-                          style={{ width: 300 }}
-                          renderInput={(params) => <TextField {...params} label="Players" variant="outlined" />}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item> 
-                      <Box pl={1}>
-                        <Button style={{ height: 54 }} variant="contained" color="primary" onClick={clearPlayerEventHandler}>Clear</Button>
-                      </Box>
-                    </Grid>
+                  <Grid item>
+                    <Box pl={3}>
+                      <TeamDataTable data={teamTableData} />
+                    </Box>
+                    <Box pt={3} align="center">
+                      <Button style={{ height: 54 }} variant="contained" color="primary" onClick={clearPlayerEventHandler}>Clear</Button>
+                    </Box>
                   </Grid>
-              <Box pt={3} pl={5}>
-                <ListAddedPlayers />
-              </Box>
               </CardContent>
             </Card>
           </Box>
@@ -754,6 +948,7 @@ const Roster = () => {
       </Grid>
     </Fragment>
   );
+
 }
  
 export default Roster;
