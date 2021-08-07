@@ -234,9 +234,9 @@ const Roster = () => {
     var xp = 0;
     var dmg = 0;
     var name = "";
+    var battles = 0;
     players.forEach((player) => {
       name = player.nickname;
-
       for (var i = 0; i < allData.length; i++) {
         if (allData[i].nickname === name) {
           wr = wr + parseFloat(allData[i].wr);
@@ -362,12 +362,16 @@ const Roster = () => {
               const nickname = cell.row.values.nickname;
               const shipName = shipsData[shipData.ship_id].name;
               var wr = 0;
+              var pr = 0;
+              var xp = 0;
+              var dmg = 0;
               if (shipData.pvp.battles > 0) {
                 wr = ((shipData.pvp.wins/shipData.pvp.battles)*100).toFixed(2);
+                pr = Math.round(getShipPR(shipData.ship_id, shipData.pvp.battles, shipData.pvp.wins, shipData.pvp.frags, shipData.pvp.damage_dealt));
+                xp = Math.round(shipData.pvp.xp/shipData.pvp.battles);
+                dmg = Math.round(shipData.pvp.damage_dealt/shipData.pvp.battles);
               }
-              const pr = Math.round(getShipPR(shipData.ship_id, shipData.pvp.battles, shipData.pvp.wins, shipData.pvp.frags, shipData.pvp.damage_dealt));
-              const xp = Math.round(shipData.pvp.xp/shipData.pvp.battles);
-              const dmg = Math.round(shipData.pvp.damage_dealt/shipData.pvp.battles);
+              
               var colorGroup = getPrGroupColor(pr);
               var style = "";
               var topGroup = 0;
