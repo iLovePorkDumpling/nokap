@@ -409,6 +409,11 @@ const Roster = () => {
       setAvgShipsPr(shipPr/numberOfPlayersInTeam);
       setAvgShipsXp(shipXp/numberOfPlayersInTeam);
       setAvgShipsDmg(shipDmg/numberOfPlayersInTeam);
+    } else {
+      setAvgShipsWr(0);
+      setAvgShipsPr(0);
+      setAvgShipsXp(0);
+      setAvgShipsDmg(0);
     }
   }
 
