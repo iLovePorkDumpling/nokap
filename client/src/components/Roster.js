@@ -920,9 +920,6 @@ const Roster = () => {
                   <li>Aug 18 - Oct 4, 7 vs 7 format, Tier VI ships</li>
                   <li>No more than two CVs or BBs per team in total.</li>
                   <li>Admiral Graf Spee and HSF Graf Spee are banned</li>
-                  <br/>
-                  <br/>
-                  <br/>
                 </ul>
                 </Box>
               </CardContent>
@@ -930,19 +927,28 @@ const Roster = () => {
           </Box>
         </Grid>
         <Grid item>
-          <Box pt={2} pl={10} pb={5}>
+          <Box pt={2} pl={5} pb={5}>
             <Card variant="outlined" style={{ backgroundColor: "#C8FACD", color: "#005249" }}>
               <CardContent>
                 <Box p={1}>
-                <h5>How-to</h5>
-                <ul>
-                  <li>Use <CheckBoxIcon fontSize="small"/> to add player to your team</li>
-                  <li>Click on <b>Ship name</b> to assign ship to your player</li>
-                  <li>Use <SearchIcon fontSize="small" /> to search for player</li>
-                  <li>Click <b>ALL</b> or <b>TEAM</b> at top left of Roster table to toggle<br/> 
-                      between displaying data of ALL members, vs only the one you selected <br/>
-                      for your team.</li>
-                </ul>
+                  <Grid container direction="row" alignItems="left">
+                    <Grid item>
+                      <h5>How-to</h5>
+                      <ul>
+                        <li>Use <CheckBoxIcon fontSize="small"/> to add player to your team</li>
+                        <li>Click on <b>Ship name</b> to assign ship to your player</li>
+                        <li>Use <SearchIcon fontSize="small" /> to search for player</li>
+                      </ul>
+                    </Grid>
+                    <Grid item>
+                      <br/>
+                      <ul>
+                        <li>Click <b>ALL</b> or <b>TEAM</b> at top left of Roster table to toggle<br/> 
+                            between displaying data of ALL members, vs only the one you selected <br/>
+                            for your team.</li>
+                      </ul>
+                    </Grid>
+                  </Grid>
                 </Box>
               </CardContent>
             </Card>            
@@ -950,8 +956,8 @@ const Roster = () => {
         </Grid>
       </Grid>
       <Grid container spacing={3}>
-        <Grid item xs={7}>
-          <Box align="left" pt={3} pl={3} pb={5}>
+        <Grid item xs={8}>
+          <Box align="left" pt={2} pl={3} pb={5}>
             <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
           </Box>
           <MaUTable {...getTableProps()}>
@@ -988,7 +994,7 @@ const Roster = () => {
           </MaUTable>
         </Grid>
         <Grid item xs={4}>
-          <Box pl={6} pt={3}>
+          <Box pl={0} pt={2}>
             <Card variant="outlined" style={{ backgroundColor: "#F4F6F8" }} >
               <CardContent>
                   <Box pb={3} align="center">
