@@ -24,9 +24,9 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import PeopleIcon from '@material-ui/icons/People';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
-import FavoriteIcon from '@material-ui/icons/Favorite';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import SearchIcon from '@material-ui/icons/Search';
 import "./Roster.css";
 
 const Roster = () => {
@@ -909,18 +909,49 @@ const Roster = () => {
   // Render the UI for your table
   return (
     <Fragment>
-      <span><b>Quick & Dirty Notes</b></span>
-      <ul>
-        <li><b>Click on player's ship name</b> to add that to your team</li>
-        <li><b>Search</b> by player's name or by ship name using search bar (top left of table below)</li>
-        <li><b>Sort by WR, or XP</b> by clicking on <b>XP</b> or <b>WR</b> header of table below.</li>
-        <li>Account PR is coming. Ship's PR for each player is available once you click on the ship name.</li>
-        <li>IStill a prototype. I'll make it more user-friendly and beautify it later</li>
-        <li>Feedback/Feature requests? Contact Fast & Curious <FavoriteIcon style={{ color: pink }} fontSize="small" /></li>
-      </ul>
+      <Grid container direction="row" alignItems="left">
+        <Grid item>
+          <Box pt={2} pl={3}>
+            <Card variant="outlined" style={{ backgroundColor: "#D0F2FF", color: "#04297A" }} >
+              <CardContent>
+                <Box p={1}>
+                <h5>Restriction</h5>
+                <ul>
+                  <li>Aug 18 - Oct 4, 7 vs 7 format, Tier VI ships</li>
+                  <li>No more than two CVs or BBs per team in total.</li>
+                  <li>Admiral Graf Spee and HSF Graf Spee are banned</li>
+                  <br/>
+                  <br/>
+                  <br/>
+                </ul>
+                </Box>
+              </CardContent>
+            </Card>            
+          </Box>
+        </Grid>
+        <Grid item>
+          <Box pt={2} pl={10} pb={5}>
+            <Card variant="outlined" style={{ backgroundColor: "#C8FACD", color: "#005249" }}>
+              <CardContent>
+                <Box p={1}>
+                <h5>How-to</h5>
+                <ul>
+                  <li>Use <CheckBoxIcon fontSize="small"/> to add player to your team</li>
+                  <li>Click on <b>Ship name</b> to assign ship to your player</li>
+                  <li>Use <SearchIcon fontSize="small" /> to search for player</li>
+                  <li>Click <b>ALL</b> or <b>TEAM</b> at top left of Roster table to toggle<br/> 
+                      between displaying data of ALL members, vs only the one you selected <br/>
+                      for your team.</li>
+                </ul>
+                </Box>
+              </CardContent>
+            </Card>            
+          </Box>
+        </Grid>
+      </Grid>
       <Grid container spacing={3}>
-        <Grid item xs={8}>
-          <Box align="right">
+        <Grid item xs={7}>
+          <Box align="left" pt={3} pl={3} pb={5}>
             <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
           </Box>
           <MaUTable {...getTableProps()}>
@@ -957,8 +988,8 @@ const Roster = () => {
           </MaUTable>
         </Grid>
         <Grid item xs={4}>
-          <Box pl={6}>
-            <Card variant="outlined">
+          <Box pl={6} pt={3}>
+            <Card variant="outlined" style={{ backgroundColor: "#F4F6F8" }} >
               <CardContent>
                   <Box pb={3} align="center">
                     <Typography variant="h5" gutterBottom>
