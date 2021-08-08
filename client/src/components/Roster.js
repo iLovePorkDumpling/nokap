@@ -23,6 +23,7 @@ import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import FavoriteIcon from '@material-ui/icons/Favorite';
@@ -145,12 +146,128 @@ const Roster = () => {
     setSearchablePlayers(searchable);
   }
 
+  const handleClickShipName = (event, row) => {
+    const playerId = row.values.id;
+
+    //Check if that item is already in TeamTableData
+    const found = teamTableData.find(player => player.playerId === playerId);
+    if (found == undefined) {
+      //Player is NOT in the TeamTableData, Add the playerId, nickname, and ship data to the TeamTableData
+      const newitem = {
+        playerId: playerId,
+        nickname: event.target.attributes.nickname.value,
+        ship: event.target.attributes.shipName.value,
+        shipWr: event.target.attributes.shipWr.value,
+        shipPr: event.target.attributes.shipPr.value,
+        shipXp: event.target.attributes.shipXp.value,
+        shipDmg: event.target.attributes.shipDmg.value
+      }
+
+      const original = teamTableData;
+      const newArray = original.concat(newitem);
+      setTeamTableData(newArray);
+      calculateTeamPlayersStats(newArray);
+      calculateTeamShipsStats (newArray);
+
+    } else {
+      //BUGBUG: These 2 cases below doesn't work. teamTableData is immutable and update record needs to be in the non-mutable ways.
+
+      //Found existing player on the TeamTableData, Check if we have Ship data
+      if (found.ship == '' || found.ship == undefined) {
+        //Existing player but NO ship data, add ship data to existing player record
+        found.ship = event.target.attributes.shipName.value;
+        found.shipWr = event.target.attributes.shipWr.value;
+        found.shipPr = event.target.attributes.shipPr.value;
+        found.shipXp = event.target.attributes.shipXp.value;
+        found.shipDmg = event.target.attributes.shipDmg.value;
+      } else {
+        //Existing player WITH ship data, Remove ship data from existing player record
+        found.ship = '';
+        found.shipWr = '';
+        found.shipPr = '';
+        found.shipXp = '';
+        found.shipDmg = '';
+      }
+    }
+
+    // if (event.target.selected == false) {
+    //   //Click is to select
+    //   switch(event.target.className) {
+    //     case "badColor":
+    //       event.target.classList.replace("badColor", "selectedBadColor");
+    //       break;
+    //     case "belowAverageColor":
+    //       event.target.classList.replace("belowAverageColor", "selectedBelowAverageColor");
+    //       break;
+    //     case "averageColor":
+    //       event.target.classList.replace("averageColor", "selectedAverageColor");
+    //       break;
+    //     case "goodColor":
+    //       event.target.classList.replace("goodColor", "selectedGoodColor");
+    //       break;
+    //     case "veryGoodColor":
+    //       event.target.classList.replace("veryGoodColor", "selectedVeryGoodColor");
+    //       break;
+    //     case "greatColor":
+    //       event.target.classList.replace("greatColor", "selectedGreatColor");
+    //       break; 
+    //     case "unicumColor":
+    //       event.target.classList.replace("unicumColor", "selectedUnicumColor");
+    //       break;
+    //     case "superUnicumColor":
+    //       event.target.classList.replace("superUnicumColor", "selectedSuperUnicumColor");
+    //       break;
+    //     case "greyColor":
+    //       event.target.classList.replace("greyColor", "selectedGreyColor");
+    //       break;
+    //     default:
+    //       // code block
+    //   }
+    // } else {
+    //   //Click is to de-select
+    // }
+  }
+
+  const handdleCheckboxChange = (row) => {
+    const playerId = row.values.id;
+    const nickname = row.values.nickname;
+
+    //Check if that item is already in TeamTableData
+    const found = teamTableData.find(player => player.playerId === playerId);
+    if (found == undefined) {
+      //Player is NOT in the TeamTableData, Add the playerId, and nickname to the TeamTableData
+      const newitem = {
+        playerId: playerId,
+        nickname: nickname,
+        ship: '',
+        shipWr: '',
+        shipPr: '',
+        shipXp: '',
+        shipDmg: ''        
+      }
+
+      const original = teamTableData;
+      const newArray = original.concat(newitem);
+      setTeamTableData(newArray);
+      calculateTeamPlayersStats(newArray); 
+      
+    } else {
+        //Found existing player on the TeamTableData, Remove the player
+        const filterData = teamTableData.filter(player => player.playerId != playerId);
+        setTeamTableData(filterData);
+    }
+  }
+
   const columns = React.useMemo(
     () => [
       {
         Header: 'ID',
         accessor: 'id', // accessor is the "key" in the data
         show: false,
+      },
+      {
+        Header: '',
+        accessor: 'selection', 
       },
       {
         Header: 'Name',
@@ -290,61 +407,6 @@ const Roster = () => {
     setAvgShipsDmg(0);
   }
 
-  const handleClickShipName = (event) => {
-    if (event.target.selected == false) {
-      //Click is to select
-      switch(event.target.className) {
-        case "badColor":
-          event.target.classList.replace("badColor", "selectedBadColor");
-          break;
-        case "belowAverageColor":
-          event.target.classList.replace("belowAverageColor", "selectedBelowAverageColor");
-          break;
-        case "averageColor":
-          event.target.classList.replace("averageColor", "selectedAverageColor");
-          break;
-        case "goodColor":
-          event.target.classList.replace("goodColor", "selectedGoodColor");
-          break;
-        case "veryGoodColor":
-          event.target.classList.replace("veryGoodColor", "selectedVeryGoodColor");
-          break;
-        case "greatColor":
-          event.target.classList.replace("greatColor", "selectedGreatColor");
-          break; 
-        case "unicumColor":
-          event.target.classList.replace("unicumColor", "selectedUnicumColor");
-          break;
-        case "superUnicumColor":
-          event.target.classList.replace("superUnicumColor", "selectedSuperUnicumColor");
-          break;
-        case "greyColor":
-          event.target.classList.replace("greyColor", "selectedGreyColor");
-          break;
-        default:
-          // code block
-      }
-
-      const newitem = {
-        nickname: event.target.attributes.nickname.value,
-        ship: event.target.attributes.shipName.value,
-        shipWr: event.target.attributes.shipWr.value,
-        shipPr: event.target.attributes.shipPr.value,
-        shipXp: event.target.attributes.shipXp.value,
-        shipDmg: event.target.attributes.shipDmg.value
-      }
-
-      const original = teamTableData;
-      const newArray = original.concat(newitem);
-      setTeamTableData(newArray);
-      calculateTeamPlayersStats(newArray);
-      calculateTeamShipsStats (newArray);
-
-    } else {
-      //Click is to de-select
-    }
-  }
-
   const handleMouseOverShipName = (event) => {
 
   }
@@ -430,7 +492,7 @@ const Roster = () => {
             <span 
               class={ship.colorGroup} 
               selected={selected}
-              onClick={handleClickShipName}
+              onClick={(event) => handleClickShipName(event, cell.row)}
               onmouseover={handleMouseOverShipName}
               playerId={ship.playerId}
               nickname={ship.nickname}
@@ -469,7 +531,9 @@ const Roster = () => {
     } else if (cell.column.id === "nickname") {
       style = { cursor: 'pointer'};
       return (<span playerId={cell.row.values.id} style={style}>{cell.row.values.nickname}</span>);
-    } else {
+    } else if (cell.column.id === "selection") {      
+      return (<Checkbox color="primary" onChange={() => handdleCheckboxChange(cell.row)} checked={state.checked}  />);
+    }  else {
       return cell.render('Cell');
     }
   }
@@ -717,7 +781,7 @@ const Roster = () => {
     });
   
     const columns = React.useMemo(
-     () => [
+     () => [      
        {
          Header: '',
          accessor: 'nickname',
@@ -729,7 +793,7 @@ const Roster = () => {
        {
          Header: 'WR',
          accessor: 'shipWr',
-         Cell: cellInfo => ( <span class={getWrGroupColor(parseFloat(cellInfo.cell.value))} >{cellInfo.cell.value}%</span> ) 
+         Cell: cellInfo => ( cellInfo.cell.value != ''? <span class={getWrGroupColor(parseFloat(cellInfo.cell.value))} >{cellInfo.cell.value}%</span> : '') 
        },
        {
          Header: 'PR',
@@ -813,7 +877,7 @@ const Roster = () => {
                 <TableRow {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map(column => (
                     <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      {column.render('Header')}
+                      &nbsp;&nbsp;&nbsp;{column.render('Header')}
                       <span>
                         {column.isSorted ? (column.isSortedDesc ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />) : ''}
                       </span>
