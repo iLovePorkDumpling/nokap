@@ -275,7 +275,7 @@ const Roster = () => {
       },
       {
         Header: '',
-        accessor: 'selection', 
+        accessor: 'selection',         
       },
       {
         Header: 'Name',
@@ -922,7 +922,7 @@ const Roster = () => {
               {rows.map((row, i) => {
                 prepareRow(row)
                 return (
-                  <TableRow {...row.getRowProps()}>
+                  <TableRow className={row.values.selection ? "rowSelected" : ''} {...row.getRowProps()}>
                     {row.cells.map(cell => {
                       return (
                         <TableCell {...cell.getCellProps()}>

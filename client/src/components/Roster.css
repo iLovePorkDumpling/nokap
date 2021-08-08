@@ -78,3 +78,7 @@
     background-color: #989898;
     color: #FFFFFF;
 }
+
+.rowSelected {
+    background-color: #e0fbfc;
+}
