@@ -187,12 +187,13 @@ const Roster = () => {
       } else {
         //Existing player WITH ship data, Remove ship data from existing player record
         newdata[foundIndex].ship = '';
-        newdata[foundIndex].shipWr = '';
-        newdata[foundIndex].shipPr = '';
-        newdata[foundIndex].shipXp = '';
-        newdata[foundIndex].shipDmg = '';
+        newdata[foundIndex].shipWr = 0;
+        newdata[foundIndex].shipPr = 0;
+        newdata[foundIndex].shipXp = 0;
+        newdata[foundIndex].shipDmg = 0;
       }
       setTeamTableData(newdata);
+      calculateTeamShipsStats (newdata);
     }
 
     // if (event.target.selected == false) {
@@ -390,14 +391,19 @@ const Roster = () => {
     var shipPr = 0;
     var shipXp = 0;
     var shipDmg = 0;
+    var skippedPlayers = 0;
     players.forEach((player) => {
-      shipWr = shipWr + parseFloat(player.shipWr);
-      shipPr = shipPr + parseInt(player.shipPr);
-      shipXp = shipXp + parseInt(player.shipXp);
-      shipDmg = shipDmg + parseInt(player.shipDmg);
+      if (player.ship != '') {
+        shipWr = shipWr + parseFloat(player.shipWr);
+        shipPr = shipPr + parseInt(player.shipPr);
+        shipXp = shipXp + parseInt(player.shipXp);
+        shipDmg = shipDmg + parseInt(player.shipDmg);
+      } else {
+        ++skippedPlayers;
+      }
     });
 
-    const numberOfPlayersInTeam = players.length;
+    const numberOfPlayersInTeam = players.length - skippedPlayers;
     if (numberOfPlayersInTeam > 0) {
       setAvgShipsWr(shipWr/numberOfPlayersInTeam);
       setAvgShipsPr(shipPr/numberOfPlayersInTeam);
@@ -814,22 +820,22 @@ const Roster = () => {
        {
          Header: 'WR',
          accessor: 'shipWr',
-         Cell: cellInfo => ( cellInfo.cell.value != ''? <span class={getWrGroupColor(parseFloat(cellInfo.cell.value))} >{cellInfo.cell.value}%</span> : '') 
+         Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getWrGroupColor(parseFloat(cellInfo.cell.value))} >{cellInfo.cell.value}%</span> : '') 
        },
        {
          Header: 'PR',
          accessor: 'shipPr',
-         Cell: cellInfo => ( <span class={getPrGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> )
+         Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getPrGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> : '')
        },
        {
           Header: 'XP',
           accessor: 'shipXp',
-          Cell: cellInfo => ( <span class={getXpGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> )
+          Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getXpGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> : '' )
       },
       {
           Header: 'Dmg',
           accessor: 'shipDmg',
-          Cell: cellInfo => ( <span class={getDmgGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> )
+          Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getDmgGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> : '')
       },
      ], []);
   
