@@ -793,12 +793,13 @@ const Roster = () => {
   // Render the UI for your table
   return (
     <Fragment>
-      <span>Quick & Dirty Notes</span>
+      <span><b>Quick & Dirty Notes</b></span>
       <ul>
-        <li>It's a work in progress. Still a prototype. I'll make it more user-friendly and beautify it later</li>
-        <li>Search by player's name or by ship name using search bar (top left of table below)</li>
-        <li>Click on player's ship name to add that to your team</li>
-        <li>You can sort by WR, or XP. Account PR is coming. Ship's PR for each player is available once you click on the ship name.</li>
+        <li><b>Click on player's ship name</b> to add that to your team</li>
+        <li><b>Search</b> by player's name or by ship name using search bar (top left of table below)</li>
+        <li><b>Sort by WR, or XP</b> by clicking on <b>XP</b> or <b>WR</b> header of table below.</li>
+        <li>Account PR is coming. Ship's PR for each player is available once you click on the ship name.</li>
+        <li>IStill a prototype. I'll make it more user-friendly and beautify it later</li>
         <li>Feedback/Feature requests? Contact Fast & Curious <FavoriteIcon style={{ color: pink }} fontSize="small" /></li>
       </ul>
       <Grid container spacing={3}>
