@@ -16,8 +16,7 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import { Divider, Grid } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
+import { Grid } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
@@ -25,9 +24,9 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import PeopleIcon from '@material-ui/icons/People';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import "./Roster.css";
 
 const Roster = () => {
@@ -256,13 +255,34 @@ const Roster = () => {
       const newArray = original.concat(newitem);
       setTeamTableData(newArray);
       calculateTeamPlayersStats(newArray); 
-      row.values.selection = true;      
+      
+      row.values.selection = true;    
+      const newData = data.slice();
+      const newDataFoundIndex = newData.findIndex(player => player.id === playerId);
+      newData[newDataFoundIndex].selection = true;
+      setData(newData);
     } else {
         //Found existing player on the TeamTableData, Remove the player
         const filterData = teamTableData.filter(player => player.playerId != playerId);
         setTeamTableData(filterData);
         calculateTeamPlayersStats(filterData);
+        
         row.values.selection = false;
+        const newData = data.slice();
+        const newDataFoundIndex = newData.findIndex(player => player.id === playerId);
+        newData[newDataFoundIndex].selection = false;
+        setData(newData);
+    }
+  }
+  
+  const toggleFilterByTeamOrAll = (event) => {
+    if (event.target.textContent === "All") {
+      const teamOnlyData = data.filter(player => player.selection == true);
+      setData(teamOnlyData);
+      event.target.textContent = "Team";
+    } else {
+      setData(allData);
+      event.target.textContent = "All";
     }
   }
 
@@ -275,7 +295,7 @@ const Roster = () => {
       },
       {
         Header: '',
-        accessor: 'selection',         
+        accessor: 'selection',          
       },
       {
         Header: 'Name',
@@ -909,9 +929,9 @@ const Roster = () => {
                 <TableRow {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map(column => (
                     <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      &nbsp;&nbsp;&nbsp;{column.render('Header')}
+                      &nbsp;&nbsp;&nbsp;{column.id != 'selection' ? column.render('Header'): <>&nbsp;&nbsp;&nbsp;<span onClick={toggleFilterByTeamOrAll} variant="contained">All</span></>}
                       <span>
-                        {column.isSorted ? (column.isSortedDesc ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />) : ''}
+                        {(column.id != 'selection' && column.isSorted) ? (column.isSortedDesc ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />) : ''}
                       </span>
                     </th>
                   ))}
