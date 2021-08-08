@@ -150,9 +150,9 @@ const Roster = () => {
     const playerId = row.values.id;
 
     //Check if that item is already in TeamTableData
-    const found = teamTableData.find(player => player.playerId === playerId);
-    if (found == undefined) {
-      //Player is NOT in the TeamTableData, Add the playerId, nickname, and ship data to the TeamTableData
+    const foundIndex = teamTableData.findIndex(player => player.playerId === playerId);
+    if (foundIndex == -1) {
+      //Player is NOT in the TeamTableData, Add the playerId, nickname, and ship data to the TeamTableData, make sure to mark CHECKED on the checkbox
       const newitem = {
         playerId: playerId,
         nickname: event.target.attributes.nickname.value,
@@ -169,25 +169,30 @@ const Roster = () => {
       calculateTeamPlayersStats(newArray);
       calculateTeamShipsStats (newArray);
 
-    } else {
-      //BUGBUG: These 2 cases below doesn't work. teamTableData is immutable and update record needs to be in the non-mutable ways.
-
+      //Mark CHECKED on the player's checkbox
+      const newdata = data.slice();
+      const newdataFoundIndex = newdata.findIndex(row => row.id === playerId);
+      newdata[newdataFoundIndex].selection = true;
+      setData(newdata);
+    } else {    
       //Found existing player on the TeamTableData, Check if we have Ship data
-      if (found.ship == '' || found.ship == undefined) {
+      const newdata = teamTableData.slice();
+      if (teamTableData[foundIndex].ship == '' || teamTableData[foundIndex].ship == undefined) {
         //Existing player but NO ship data, add ship data to existing player record
-        found.ship = event.target.attributes.shipName.value;
-        found.shipWr = event.target.attributes.shipWr.value;
-        found.shipPr = event.target.attributes.shipPr.value;
-        found.shipXp = event.target.attributes.shipXp.value;
-        found.shipDmg = event.target.attributes.shipDmg.value;
+        newdata[foundIndex].ship = event.target.attributes.shipName.value;
+        newdata[foundIndex].shipWr = event.target.attributes.shipWr.value;
+        newdata[foundIndex].shipPr = event.target.attributes.shipPr.value;
+        newdata[foundIndex].shipXp = event.target.attributes.shipXp.value;
+        newdata[foundIndex].shipDmg = event.target.attributes.shipDmg.value;
       } else {
         //Existing player WITH ship data, Remove ship data from existing player record
-        found.ship = '';
-        found.shipWr = '';
-        found.shipPr = '';
-        found.shipXp = '';
-        found.shipDmg = '';
+        newdata[foundIndex].ship = '';
+        newdata[foundIndex].shipWr = '';
+        newdata[foundIndex].shipPr = '';
+        newdata[foundIndex].shipXp = '';
+        newdata[foundIndex].shipDmg = '';
       }
+      setTeamTableData(newdata);
     }
 
     // if (event.target.selected == false) {
@@ -250,11 +255,13 @@ const Roster = () => {
       const newArray = original.concat(newitem);
       setTeamTableData(newArray);
       calculateTeamPlayersStats(newArray); 
-      
+      row.values.selection = true;      
     } else {
         //Found existing player on the TeamTableData, Remove the player
         const filterData = teamTableData.filter(player => player.playerId != playerId);
         setTeamTableData(filterData);
+        calculateTeamPlayersStats(filterData);
+        row.values.selection = false;
     }
   }
 
@@ -370,6 +377,11 @@ const Roster = () => {
       setAvgPlayersPr(pr/numberOfPlayersInTeam);
       setAvgPlayersXp(xp/numberOfPlayersInTeam);
       setAvgPlayersDmg(dmg/numberOfPlayersInTeam);
+    } else {
+      setAvgPlayersWr(0);
+      setAvgPlayersPr(0);
+      setAvgPlayersXp(0);
+      setAvgPlayersDmg(0);
     }
   }
 
@@ -395,7 +407,12 @@ const Roster = () => {
   }
 
   const clearPlayerEventHandler= () => {
-    setData(allData);
+    const newdata = allData.slice();
+    newdata.forEach((element) => {
+      element.selection = false;
+    });
+
+    setData(newdata);
     setTeamTableData([]);
     setAvgPlayersWr(0);
     setAvgPlayersPr(0);
@@ -531,8 +548,12 @@ const Roster = () => {
     } else if (cell.column.id === "nickname") {
       style = { cursor: 'pointer'};
       return (<span playerId={cell.row.values.id} style={style}>{cell.row.values.nickname}</span>);
-    } else if (cell.column.id === "selection") {      
-      return (<Checkbox color="primary" onChange={() => handdleCheckboxChange(cell.row)} checked={state.checked}  />);
+    } else if (cell.column.id === "selection") {   
+        if (cell.row.values.selection == false || cell.row.values.selection == undefined) {
+          return (<Checkbox color="primary" onChange={() => handdleCheckboxChange(cell.row)} checked={false} />);
+        } else { 
+          return (<Checkbox color="primary" onChange={() => handdleCheckboxChange(cell.row)} checked={true} />);
+        }  
     }  else {
       return cell.render('Cell');
     }
