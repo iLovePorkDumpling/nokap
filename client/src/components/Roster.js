@@ -493,21 +493,19 @@ const Roster = () => {
               }
               
               var colorGroup = getPrGroupColor(pr);
-              var style = "";
+              var style;
               var topGroup = 0;
 
               if (recommendedT6Ships.indexOf(shipName) > -1) {
                 style = { fontWeight: 'bold', fontSize: 16, cursor: 'pointer' };
                 topGroup = 1;
               } else {
-                style = { fontWeight: 'lighter', fontSize: 14, cursor: 'pointer' };
                 topGroup = 0;
+                style = { fontWeight: 'lighter', fontSize: 14, cursor: 'pointer' };
               }
 
-              if (shipData.pvp.battles < 5) {
+              if (shipData.pvp.battles == 0) {
                 colorGroup = "greyColor";
-                style = { fontWeight: 'lighter', fontSize: 14, cursor: 'pointer'};
-                topGroup = 0;
               }
 
               const selected = isShipSelected(playerId, shipName);
@@ -534,21 +532,17 @@ const Roster = () => {
         }
       }
 
-      //Recommended Ships with 5 or more battles
-      const recommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup === 1 && (ship.colorGroup !== "greyPrColor" || ship.colorGroup !== "selected_greyPrColor");});  
+      //Meta Ships
+      const recommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup === 1; });  
       
-      //Non-Recommended Ships wiht less than 5 Battles
-      const nonRecommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup === 0 && (ship.colorGroup !== "greyPrColor" || ship.colorGroup !== "selected_greyPrColor"); });
+      //Non-Meta Ships
+      const nonRecommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup === 0; });
 
-      //Ships with less than 5 battles
-      const greyShips =  shipsList.filter(function(ship) { return ship.colorGroup === "greyPrColor" || ship.colorGroup === "selected_greyPrColor"; });
-      
       recommendedColoredShips.sort(function(a, b) { return b.pr - a.pr; })
       nonRecommendedColoredShips.sort(function(a, b) { return b.pr - a.pr; })
-      greyShips.sort(function(a, b) { return b.pr - a.pr; })
 
       const ShipsList = ({shipsList}) => (
-        <>
+        <Grid container direction="row" alignItems="left">
           {shipsList.map(ship => (
             <span 
               class={ship.colorGroup} 
@@ -566,14 +560,13 @@ const Roster = () => {
                 &ensp;&ensp;{ship.shipName}({ship.shipBattles })&ensp;&ensp;
             </span>
           ))}
-        </>
+        </Grid>
       );
 
       return (
         <div>
           <ShipsList shipsList={recommendedColoredShips} /><br/>
-          <ShipsList shipsList={nonRecommendedColoredShips} /><br/>
-          <ShipsList shipsList={greyShips} /><br/>
+          <ShipsList shipsList={nonRecommendedColoredShips} />
         </div>
       );
     } else if (cell.column.id === "pr") {
