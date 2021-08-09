@@ -277,13 +277,13 @@ const Roster = () => {
   }
   
   const toggleFilterByTeamOrAll = (event) => {
-    if (event.target.textContent === "All") {
+    if (event.target.textContent === "ALL") {
       const teamOnlyData = data.filter(player => player.selection == true);
       setData(teamOnlyData);
-      event.target.textContent = "Team";
+      event.target.textContent = "TEAM";
     } else {
       setData(allData);
-      event.target.textContent = "All";
+      event.target.textContent = "ALL";
     }
   }
 
@@ -971,7 +971,7 @@ const Roster = () => {
                 <TableRow {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map(column => (
                     <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      &nbsp;&nbsp;&nbsp;{column.id != 'selection' ? column.render('Header'): <>&nbsp;&nbsp;&nbsp;<span onClick={toggleFilterByTeamOrAll} variant="contained">All</span></>}
+                      &nbsp;&nbsp;&nbsp;{column.id != 'selection' ? column.render('Header'): <><span class="AllTeamToggle" onClick={toggleFilterByTeamOrAll} variant="contained">ALL</span></>}
                       <span>
                         {(column.id != 'selection' && column.isSorted) ? (column.isSortedDesc ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />) : ''}
                       </span>
