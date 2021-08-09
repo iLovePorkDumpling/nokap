@@ -356,6 +356,7 @@ const Roster = () => {
     columns,
     data,
     autoResetGlobalFilter: false,
+    autoResetSortBy: false,
     defaultSorted,
     initialState: {
       hiddenColumns: columns.map(column => {
