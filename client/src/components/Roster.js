@@ -355,6 +355,7 @@ const Roster = () => {
   } = useTable({
     columns,
     data,
+    autoResetGlobalFilter: false,
     defaultSorted,
     initialState: {
       hiddenColumns: columns.map(column => {
