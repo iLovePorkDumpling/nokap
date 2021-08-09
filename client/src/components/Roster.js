@@ -28,6 +28,7 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import SearchIcon from '@material-ui/icons/Search';
 import "./Roster.css";
+import e from 'cors';
 
 const Roster = () => {
 
@@ -455,8 +456,17 @@ const Roster = () => {
     setAvgShipsDmg(0);
   }
 
-  const handleMouseOverShipName = (event) => {
+  const handleMouseOverShipName = (event) => {}
 
+  const isShipSelected = (playerId, shipName) => {
+    const row = teamTableData.find((player) => player.playerId === playerId);
+    if (row == undefined) {
+      return false;
+    } else if (row.ship != shipName) {
+      return false;
+    } else {
+      return true;
+    }
   }
  
   const renderCell = (cell) => {
@@ -495,9 +505,14 @@ const Roster = () => {
               }
 
               if (shipData.pvp.battles < 5) {
-                colorGroup = "greyPrColor";
+                colorGroup = "greyColor";
                 style = { fontWeight: 'lighter', fontSize: 14, cursor: 'pointer'};
                 topGroup = 0;
+              }
+
+              const selected = isShipSelected(playerId, shipName);
+              if (selected) {
+                colorGroup = "selected_" + colorGroup;
               }
 
               const newItem = { 
@@ -520,26 +535,23 @@ const Roster = () => {
       }
 
       //Recommended Ships with 5 or more battles
-      const recommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup == 1 && ship.colorGroup !== "greyPrColor";});  
+      const recommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup === 1 && (ship.colorGroup !== "greyPrColor" || ship.colorGroup !== "selected_greyPrColor");});  
       
       //Non-Recommended Ships wiht less than 5 Battles
-      const nonRecommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup == 0 && ship.colorGroup !== "greyPrColor"; });
+      const nonRecommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup === 0 && (ship.colorGroup !== "greyPrColor" || ship.colorGroup !== "selected_greyPrColor"); });
 
       //Ships with less than 5 battles
-      const greyShips =  shipsList.filter(function(ship) { return ship.colorGroup === "greyPrColor"; });
+      const greyShips =  shipsList.filter(function(ship) { return ship.colorGroup === "greyPrColor" || ship.colorGroup === "selected_greyPrColor"; });
       
       recommendedColoredShips.sort(function(a, b) { return b.pr - a.pr; })
       nonRecommendedColoredShips.sort(function(a, b) { return b.pr - a.pr; })
       greyShips.sort(function(a, b) { return b.pr - a.pr; })
-
-      const selected = false;
 
       const ShipsList = ({shipsList}) => (
         <>
           {shipsList.map(ship => (
             <span 
               class={ship.colorGroup} 
-              selected={selected}
               onClick={(event) => handleClickShipName(event, cell.row)}
               onmouseover={handleMouseOverShipName}
               playerId={ship.playerId}

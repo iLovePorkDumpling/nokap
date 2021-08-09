@@ -34,47 +34,47 @@
     color: #989898;
 }
 
-.selectedBadColor {
+.selected_badColor {
     background-color: #FE0E00;
     color: #FFFFFF;
 }
 
-.selectedBelowAverageColor {
+.selected_belowAverageColor {
     background-color: #FE7903;
     color: #FFFFFF;
 }
 
-.selectedAverageColor {
+.selected_averageColor {
     background-color: #FFC71F;
     color: #FFFFFF;
 }
 
-.selectedGoodColor {
+.selected_goodColor {
     background-color: #44B300;
     color: #FFFFFF;
 }
 
-.selectedVeryGoodColor {
+.selected_veryGoodColor {
     background-color: #318000;
     color: #FFFFFF;
 }
 
-.selectedGreatColor {
+.selected_greatColor {
     background-color: #02C9B3;
     color: #FFFFFF;
 }
 
-.selectedUnicumColor {
+.selected_unicumColor {
     background-color: #D042F3;
     color: #FFFFFF;
 }
 
-.selectedSuperUnicumColor {
+.selected_superUnicumColor {
     background-color: #A00DC5;
     color: #FFFFFF;
 }
 
-.selectedGreyColor {
+.selected_greyColor {
     background-color: #989898;
     color: #FFFFFF;
 }
