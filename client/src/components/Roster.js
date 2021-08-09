@@ -538,8 +538,8 @@ const Roster = () => {
       //Non-Meta Ships
       const nonRecommendedColoredShips =  shipsList.filter(function(ship) { return ship.topGroup === 0; });
 
-      recommendedColoredShips.sort(function(a, b) { return b.pr - a.pr; })
-      nonRecommendedColoredShips.sort(function(a, b) { return b.pr - a.pr; })
+      recommendedColoredShips.sort(function(a, b) { return b.shipPr - a.shipPr; })
+      nonRecommendedColoredShips.sort(function(a, b) { return b.shipPr - a.shipPr; })
 
       const ShipsList = ({shipsList}) => (
         <Grid container direction="row" alignItems="left">
