@@ -604,9 +604,6 @@ const Roster = () => {
       const color = getWrGroupColor(cell.row.values.wr);
       const style = { fontWeight: 'bold'};
       return (<span class={color} style={style}>{cell.row.values.wr}%</span>);
-    } else if (cell.column.id === "nickname") {
-      style = { cursor: 'pointer'};
-      return (<span playerId={cell.row.values.id} style={style}>{cell.row.values.nickname}</span>);
     } else if (cell.column.id === "selection") {   
         if (cell.row.values.selection == false || cell.row.values.selection == undefined) {
           return (<Checkbox color="primary" onChange={() => handdleCheckboxChange(cell.row)} checked={false} />);
@@ -989,8 +986,8 @@ const Roster = () => {
                     <Grid item>
                       <br/>
                       <ul>
-                        <li>Click <b>ALL</b> or <b>TEAM</b> to toggle between data<br/> 
-                             of all players, vs selectd team-only players</li>
+                        <li>Click <span class='AllTeamToggle'>ALL</span> or <span class='AllTeamToggle'>TEAM</span> to toggle between data<br/> 
+                             of all players vs. selectd players only.</li>
                       </ul>
                     </Grid>
                   </Grid>
