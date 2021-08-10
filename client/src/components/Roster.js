@@ -27,6 +27,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import SearchIcon from '@material-ui/icons/Search';
+import ClearIcon from '@material-ui/icons/Clear';
 import "./Roster.css";
 import e from 'cors';
 
@@ -843,6 +844,20 @@ const Roster = () => {
     return pr;
   }
 
+  const handdleRemovePlayerFromTeam = (event) => {
+    const playerId = parseInt(event.currentTarget.attributes.playerId.value);
+    const filteredData = teamTableData.filter((player) => player.playerId !== playerId);
+    setTeamTableData(filteredData);
+    calculateTeamPlayersStats(filteredData);
+    calculateTeamShipsStats(filteredData);
+
+    //Remove check mark from checkbox in Roster table
+    const newData = data.slice();
+    const foundIndex = newData.findIndex((player) => player.id === playerId);
+    newData[foundIndex].selection = false;
+    setData(newData);
+  }
+
   const TeamDataTable = ({data}) => {
     const useStyles = makeStyles({
       table: {
@@ -888,6 +903,11 @@ const Roster = () => {
           accessor: 'shipDmg',
           Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getDmgGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}&nbsp;</span> : '')
       },
+      {
+        Header: '',
+        accessor: 'delete',   
+        Cell: cellInfo => ( <Button color="primary" playerId={cellInfo.row.original.playerId} onClick={handdleRemovePlayerFromTeam}><ClearIcon fontSize="small"/></Button> )
+      }
      ], []);
   
     const {
