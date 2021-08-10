@@ -904,10 +904,10 @@ const Roster = () => {
       {
         Header: '',
         accessor: 'delete',   
-        Cell: cellInfo => ( <Button color="primary" playerId={cellInfo.row.original.playerId} onClick={handdleRemovePlayerFromTeam}><ClearIcon fontSize="small"/></Button> )
+        Cell: cellInfo => ( <ClearIcon playerId={cellInfo.row.original.playerId} onClick={handdleRemovePlayerFromTeam} fontSize="small"/> )
       }
      ], []);
-  
+     
     const {
       getTableProps,
       getTableBodyProps,
@@ -1154,7 +1154,7 @@ const Roster = () => {
                   </Grid>
                   <br/>
                   <Grid item>
-                    <Box pl={3}>
+                    <Box pl={1}>
                       <TeamDataTable data={teamTableData} />
                     </Box>
                     <Box pt={3} align="center">
