@@ -148,17 +148,19 @@ const Roster = () => {
 
   const handleClickShipName = (event, row) => {
     const playerId = row.values.id;
+    const shipId = event.target.attributes.shipId.value;
 
     //Check if that item is already in TeamTableData
     const foundIndex = teamTableData.findIndex(player => player.playerId === playerId);
     if (foundIndex == -1) {
       //Player is NOT in the TeamTableData, Add the playerId, nickname, and ship data to the TeamTableData, make sure to mark CHECKED on the checkbox
+      
       const newitem = {
         playerId: playerId,
         nickname: event.target.attributes.nickname.value,
-        shipId: event.target.attributes.shipId.value,
+        shipId: shipId,
         ship: event.target.attributes.shipName.value,
-        shipType: shipsData[event.target.attributes.shipId.value].type,
+        shipType: shipsData[shipId].type,
         shipWr: event.target.attributes.shipWr.value,
         shipPr: event.target.attributes.shipPr.value,
         shipXp: event.target.attributes.shipXp.value,
@@ -185,9 +187,9 @@ const Roster = () => {
       const newdata = teamTableData.slice();
       if (teamTableData[foundIndex].ship == '' || teamTableData[foundIndex].ship == undefined) {
         //Existing player but NO ship data, add ship data to existing player record
-        newdata[foundIndex].shipId = event.target.attributes.shipId.value;
+        newdata[foundIndex].shipId = shipId;
         newdata[foundIndex].ship = event.target.attributes.shipName.value;
-        newdata[foundIndex].shipType = event.target.attributes.shipType.value;
+        newdata[foundIndex].shipType = shipsData[shipId].type;
         newdata[foundIndex].shipWr = event.target.attributes.shipWr.value;
         newdata[foundIndex].shipPr = event.target.attributes.shipPr.value;
         newdata[foundIndex].shipXp = event.target.attributes.shipXp.value;
