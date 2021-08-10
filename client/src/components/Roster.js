@@ -952,7 +952,6 @@ const Roster = () => {
     );
   }
 
-  const pink = "#f48fb1";
   // Render the UI for your table
   return (
     <Fragment>
