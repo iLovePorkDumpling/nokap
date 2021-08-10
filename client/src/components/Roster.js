@@ -869,22 +869,22 @@ const Roster = () => {
        {
          Header: 'WR',
          accessor: 'shipWr',
-         Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getWrGroupColor(parseFloat(cellInfo.cell.value))} >{cellInfo.cell.value}%</span> : '') 
+         Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getWrGroupColor(parseFloat(cellInfo.cell.value))} >{cellInfo.cell.value}%&nbsp;</span> : '') 
        },
        {
          Header: 'PR',
          accessor: 'shipPr',
-         Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getPrGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> : '')
+         Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getPrGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}&nbsp;</span> : '')
        },
        {
           Header: 'XP',
           accessor: 'shipXp',
-          Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getXpGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> : '' )
+          Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getXpGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}&nbsp;</span> : '' )
       },
       {
           Header: 'Dmg',
           accessor: 'shipDmg',
-          Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getDmgGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}</span> : '')
+          Cell: cellInfo => ( cellInfo.cell.value != '' ? <span class={getDmgGroupColor(parseInt(cellInfo.cell.value))} >{cellInfo.cell.value}&nbsp;</span> : '')
       },
      ], []);
   
