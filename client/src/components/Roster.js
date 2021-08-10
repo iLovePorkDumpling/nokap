@@ -173,7 +173,7 @@ const Roster = () => {
       const newArray = original.concat(newitem);
 
       //Sort by ship type
-      newArray.sort(function(a, b) { return (a.shipType < b.shipType) ? -1 : (a.shipType > b.shipType) ? 1 : 0; });
+      newArray.sort(function(a, b) { return (a.shipType < b.shipType) ? -1 : (a.shipType > b.shipType) ? 1 : (a.shipPr < b.shipPr) ? 1 : (a.shipPr > b.shipPr) ? -1: 0; });
 
       setTeamTableData(newArray);
       calculateTeamPlayersStats(newArray);
