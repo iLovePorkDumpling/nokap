@@ -156,7 +156,9 @@ const Roster = () => {
       const newitem = {
         playerId: playerId,
         nickname: event.target.attributes.nickname.value,
+        shipId: event.target.attributes.shipId.value,
         ship: event.target.attributes.shipName.value,
+        shipType: shipsData[event.target.attributes.shipId.value].type,
         shipWr: event.target.attributes.shipWr.value,
         shipPr: event.target.attributes.shipPr.value,
         shipXp: event.target.attributes.shipXp.value,
@@ -165,6 +167,10 @@ const Roster = () => {
 
       const original = teamTableData;
       const newArray = original.concat(newitem);
+
+      //Sort by ship type
+      newArray.sort(function(a, b) { return (a.shipType < b.shipType) ? -1 : (a.shipType > b.shipType) ? 1 : 0; });
+
       setTeamTableData(newArray);
       calculateTeamPlayersStats(newArray);
       calculateTeamShipsStats (newArray);
@@ -179,14 +185,21 @@ const Roster = () => {
       const newdata = teamTableData.slice();
       if (teamTableData[foundIndex].ship == '' || teamTableData[foundIndex].ship == undefined) {
         //Existing player but NO ship data, add ship data to existing player record
+        newdata[foundIndex].shipId = event.target.attributes.shipId.value;
         newdata[foundIndex].ship = event.target.attributes.shipName.value;
+        newdata[foundIndex].shipType = event.target.attributes.shipType.value;
         newdata[foundIndex].shipWr = event.target.attributes.shipWr.value;
         newdata[foundIndex].shipPr = event.target.attributes.shipPr.value;
         newdata[foundIndex].shipXp = event.target.attributes.shipXp.value;
         newdata[foundIndex].shipDmg = event.target.attributes.shipDmg.value;
+
+        //Sort by ship type
+        newdata.sort(function(a, b) { return (a.shipType < b.shipType) ? -1 : (a.shipType > b.shipType) ? 1 : 0; });
       } else {
         //Existing player WITH ship data, Remove ship data from existing player record
+        newdata[foundIndex].shipId = '';
         newdata[foundIndex].ship = '';
+        newdata[foundIndex].shipType = '';
         newdata[foundIndex].shipWr = 0;
         newdata[foundIndex].shipPr = 0;
         newdata[foundIndex].shipXp = 0;
@@ -245,7 +258,9 @@ const Roster = () => {
       const newitem = {
         playerId: playerId,
         nickname: nickname,
+        shipId: '',
         ship: '',
+        shipType: '',
         shipWr: '',
         shipPr: '',
         shipXp: '',
@@ -516,6 +531,7 @@ const Roster = () => {
               }
 
               const newItem = { 
+                                shipId: shipData.ship_id,
                                 shipName: shipName,
                                 shipBattles: shipData.pvp.battles,
                                 colorGroup: colorGroup,
@@ -552,6 +568,7 @@ const Roster = () => {
               onmouseover={handleMouseOverShipName}
               playerId={ship.playerId}
               nickname={ship.nickname}
+              shipId={ship.shipId}
               shipName={ship.shipName}
               shipBattles={ship.shipBattles}
               shipWr={ship.shipWr}
