@@ -28,6 +28,7 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import SearchIcon from '@material-ui/icons/Search';
 import ClearIcon from '@material-ui/icons/Clear';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 import "./Roster.css";
 import e from 'cors';
 
@@ -957,10 +958,10 @@ const Roster = () => {
     <Fragment>
       <Grid container direction="row" alignItems="left">
         <Grid item>
-          <Box pt={2} pl={3}>
+          <Box pt={3} pl={0} pb={6}>
             <Card variant="outlined" style={{ backgroundColor: "#D0F2FF", color: "#04297A" }} >
               <CardContent>
-                <Box p={1}>
+                <Box p={0} pr={1}>
                 <h5>Restriction</h5>
                 <ul>
                   <li>Aug 18 - Oct 4, 7 vs 7 format, Tier VI ships</li>
@@ -973,10 +974,10 @@ const Roster = () => {
           </Box>
         </Grid>
         <Grid item>
-          <Box pt={2} pl={5} pb={5}>
+          <Box pt={3} pl={7} pb={6}>
             <Card variant="outlined" style={{ backgroundColor: "#C8FACD", color: "#005249" }}>
               <CardContent>
-                <Box p={1}>
+                <Box p={0} pr={1}>
                   <Grid container direction="row" alignItems="left">
                     <Grid item>
                       <h5>How-to</h5>
@@ -989,9 +990,28 @@ const Roster = () => {
                     <Grid item>
                       <br/>
                       <ul>
-                        <li>Click <b>ALL</b> or <b>TEAM</b> at top left of Roster table to toggle<br/> 
-                            between displaying data of ALL members, vs only the one you selected <br/>
-                            for your team.</li>
+                        <li>Click <b>ALL</b> or <b>TEAM</b> to toggle between data<br/> 
+                             of all players, vs selectd team-only players</li>
+                      </ul>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </CardContent>
+            </Card>            
+          </Box>
+        </Grid>
+        <Grid item>
+          <Box pt={3} pl={7} pb={6}>
+            <Card variant="outlined" style={{ backgroundColor: "#FFF7CD", color: "#	7A4F01" }}>
+              <CardContent>
+                <Box p={0} pr={1}>
+                  <Grid container direction="row" alignItems="left">
+                    <Grid item>
+                      <h5>Bugs / Feature Requests?</h5>
+                      <ul>
+                        <li>Bugs? BUGS!?!? I <FavoriteIcon color='secondary' /> bugs. DM Fast&Curious.</li>
+                        <li>Same with feature requests.</li>
+                        <li>Thank you for your feedback.</li>
                       </ul>
                     </Grid>
                   </Grid>
@@ -1003,7 +1023,7 @@ const Roster = () => {
       </Grid>
       <Grid container spacing={3}>
         <Grid item xs={8}>
-          <Box align="left" pt={2} pl={3} pb={5}>
+          <Box align="left" pt={1} pl={0} pb={7}>
             <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
           </Box>
           <MaUTable {...getTableProps()}>
@@ -1040,7 +1060,7 @@ const Roster = () => {
           </MaUTable>
         </Grid>
         <Grid item xs={4}>
-          <Box pl={0} pt={2}>
+          <Box pl={0} pt={1}>
             <Card variant="outlined" style={{ backgroundColor: "#F4F6F8" }} >
               <CardContent>
                   <Box pb={3} align="center">
