@@ -1154,7 +1154,7 @@ const Roster = () => {
                   </Grid>
                   <br/>
                   <Grid item>
-                    <Box pl={1}>
+                    <Box align="center">
                       <TeamDataTable data={teamTableData} />
                     </Box>
                     <Box pt={3} align="center">
