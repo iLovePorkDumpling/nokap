@@ -19,7 +19,6 @@ import TopDogs from "./TopDogs";
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
 import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
-//import ExpectedShipData from '../configdata/shipsexpecteddata.json';
 
 
 //CSS
@@ -35,51 +34,107 @@ const T6Ships = () => {
 
   const [data, setData] = useState([]);
   const [allData, setAllData] = useState([]);
+  const [expectedShipsData, setExpectedShipsData] = useState([]);
 
-    useEffect(() => {
-      prepareData();      
-    }, []);
+  useEffect(() => {
+    const loadData = async () => {
+      const expectedData = await import(`../configdata/expectedshipsdata`)
+                              .then(result => {
+                                setExpectedShipsData(result.default.data);
+                                prepareData(result.default.data);
+                              });
+    }
+    loadData();
+  }, []);
 
-    const sortbyShiptype = (a, b) => {
-      if ( a.shipType < b.shipType ) {
-        return -1;
-      }
-      if ( a.shipType > b.shipType ) {
-        return 1;
-      }
-      return 0;
+  const sortbyShiptype = (a, b) => {
+    if ( a.shipType < b.shipType ) {
+      return -1;
+    }
+    if ( a.shipType > b.shipType ) {
+      return 1;
+    }
+    return 0;
+  }
+
+    // const calculateWR = (battles, wins) => {
+    //   // Bad
+    //   // 47 >= Below Average
+    //   // 49 >= Average
+    //   // 52 >= Good
+    //   // 54 >= Very Good
+    //   // 56 >= Great
+    //   // 60 >= Unicom
+    //   // 65 >= Super Unicom
+
+    //   if (battles > 0) {
+    //     const wr = (wins/battles) * 100;
+    //     var wrgroup = "Bad";     
+    //     if (wr < 47) { wrgroup = "Bad"; } else
+    //     if (wr < 50) { wrgroup = "Below Average"; } else
+    //     if (wr < 52) { wrgroup = "Average"; } else
+    //     if (wr < 54) { wrgroup = "Good"; } else
+    //     if (wr < 56) { wrgroup = "Very Good"; } else
+    //     if (wr < 60) { wrgroup = "Great"; } else
+    //     if (wr < 65) { wrgroup = "Unicom"; } else {
+    //       wrgroup = "Super Unicom";
+    //     }
+    //   } else {
+    //     wrgroup = "Bad";
+    //   }
+
+    //   return wrgroup;
+    // }
+
+    const getShipPR = (shipId, battles, wins, frags, dmg, expectedShipsData) => {
+      //Preparing data to calculate
+      const actualDmg = dmg/battles;
+      const actualWins = (wins/battles)*100;
+      const actualFrags = frags/battles;
+  
+      const expectedDmg = expectedShipsData[shipId].average_damage_dealt;
+      const expectedWins = expectedShipsData[shipId].win_rate;
+      const expectedFrags = expectedShipsData[shipId].average_frags;
+  
+      //Ratios
+      const rDmg = actualDmg/expectedDmg;
+      const rWins = actualWins/expectedWins;
+      const rFrags = actualFrags/expectedFrags;
+  
+      //Normalization
+      const nDmg = Math.max(0, (rDmg - 0.4) / (1 - 0.4));
+      const nFrags = Math.max(0, (rFrags - 0.1) / (1 - 0.1));
+      const nWins = Math.max(0, (rWins - 0.7) / (1 - 0.7));
+  
+      const pr = 700*nDmg + 300*nFrags + 150*nWins;
+  
+      return pr;
     }
 
-    const calculateWR = (battles, wins) => {
-      // Bad
-      // 47 >= Below Average
-      // 49 >= Average
-      // 52 >= Good
-      // 54 >= Very Good
-      // 56 >= Great
-      // 60 >= Unicom
-      // 65 >= Super Unicom
+    const getPrGroup = (pr) => {
+      // Bad 	0 - 750
+      // Below Average 	750 - 1100
+      // Average 	1100 - 1350
+      // Good 	1350 - 1550
+      // Very Good 	1550 - 1750
+      // Great 	1750 - 2100
+      // Unicum 	2100 - 2450
+      // Super Uicom 	2450 - 9999 
 
-      if (battles > 0) {
-        const wr = (wins/battles) * 100;
-        var wrgroup = "Bad";     
-        if (wr < 47) { wrgroup = "Bad"; } else
-        if (wr < 50) { wrgroup = "Below Average"; } else
-        if (wr < 52) { wrgroup = "Average"; } else
-        if (wr < 54) { wrgroup = "Good"; } else
-        if (wr < 56) { wrgroup = "Very Good"; } else
-        if (wr < 60) { wrgroup = "Great"; } else
-        if (wr < 65) { wrgroup = "Unicom"; } else {
-          wrgroup = "Super Unicom";
-        }
-      } else {
-        wrgroup = "Bad";
+      var prgroup = "";
+      if (pr < 751) { prgroup = "Bad"; } else
+      if (pr < 1101) { prgroup = "Below Average"; } else
+      if (pr < 1351) { prgroup = "Average"; } else
+      if (pr < 1551) { prgroup = "Good"; } else
+      if (pr < 1751) { prgroup = "Very Good"; } else
+      if (pr < 2101) { prgroup = "Great"; } else
+      if (pr < 2451) { prgroup = "Unicom"; } else {
+        prgroup = "Super Unicom";
       }
-
-      return wrgroup;
+      return prgroup;
     }
 
-    const prepareData =  () => {
+    const prepareData =  (expectedShipsData) => {
       const newdata = [];
 
       var newitem = null;
@@ -92,8 +147,11 @@ const T6Ships = () => {
               const shipType = ShipsData[ship.ship_id].type;
               var wr = Math.round((ship.pvp.wins/ship.pvp.battles)*100);
               if (ship.pvp.battles === 0) { wr = 0; }
-              const playerName = member.nickname + " / " + ship.pvp.battles + " battles";
-              const wrgroup = calculateWR(ship.pvp.battles, ship.pvp.wins);
+              const nickname = member.nickname;
+              const playerName = nickname + " / " + ship.pvp.battles + " battles";
+              // const wrgroup = calculateWR(ship.pvp.battles, ship.pvp.wins);
+              const pr = Math.round(getShipPR(ship.ship_id, ship.pvp.battles, ship.pvp.wins, ship.pvp.frags, ship.pvp.damage_dealt, expectedShipsData));
+              const prgroup = getPrGroup(pr);
 
               newitem = {
                 shipName: shipName,
@@ -116,7 +174,7 @@ const T6Ships = () => {
                 BadPlayers: []        
               };
 
-              switch(wrgroup) {
+              switch(prgroup) {
                 case "Super Unicom":
                   newitem.SuperUnicom++;
                   newitem.SuperUnicomPlayers.push(playerName);
@@ -161,7 +219,7 @@ const T6Ships = () => {
                 var found = newdata.find(x => x.shipName == shipName);
                 if (found != undefined) {
                   //If found, +1 to count
-                  switch(wrgroup) {
+                  switch(prgroup) {
                     case "Super Unicom":
                       found.SuperUnicom++;
                       found.SuperUnicomPlayers.push(playerName);
