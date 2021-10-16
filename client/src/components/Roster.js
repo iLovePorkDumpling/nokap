@@ -5,7 +5,7 @@ import GlobalFilter from './GlobalFilter';
 //Data
 import NokapMembersData from "../configdata/nokapmembersdata.json";
 import ShipsData from "../configdata/shipsdata.json";
-import RecommendedT6Ships from '../configdata/recommendedt6ships.json';
+import RecommendedT10Ships from '../configdata/recommendedt10ships.json';
 // import RentalShipidsReplacement from '../configdata/rentalshipidsreplacement.json';
 // import ExpectedShipsData from '../configdata/expectedshipsdata.json';
 
@@ -43,7 +43,7 @@ const Roster = () => {
   const [expectedShipsData, setExpectedShipsData] = useState([]);
   const [shipsData, setShipsData] = useState([]);
   // const [rentalShipidsReplacement, setRentalShipidsReplacement] = useState([]);
-  const [recommendedT6Ships, setRecommendedT6Ships] = useState([]);
+  const [recommendedT10Ships, setRecommendedT10Ships] = useState([]);
   const [teamTableData, setTeamTableData] = useState([]);
 
   const [avgPlayersWr, setAvgPlayersWr] = useState(0);
@@ -138,7 +138,7 @@ const Roster = () => {
 
   const prepareData = async () => {
     await setShipsData(ShipsData);
-    await setRecommendedT6Ships(RecommendedT6Ships);
+    await setRecommendedT10Ships(RecommendedT10Ships);
     // setAllData(NokapMembersData);
     // setData(NokapMembersData);
     const searchable = [];
@@ -350,7 +350,7 @@ const Roster = () => {
         show: false,
       },
       {
-        Header: 'T6 Ships (Color based on PR)',
+        Header: 'T10 Ships (Color based on PR)',
         accessor: 'ship_names',
       },
     ], []);
@@ -498,7 +498,7 @@ const Roster = () => {
         if (playerShipsData != undefined && playerShipsData != null) {
           for (let i = 0; i < playerShipsData.length; i++) {
             const shipData = playerShipsData[i];
-            if (shipData != undefined && shipsData[shipData.ship_id] && shipsData[shipData.ship_id].tier === 6) {
+            if (shipData != undefined && shipsData[shipData.ship_id] && shipsData[shipData.ship_id].tier === 10) {
               const playerId = shipData.account_id;
               const nickname = cell.row.values.nickname;
               const shipName = shipsData[shipData.ship_id].name;
@@ -517,7 +517,7 @@ const Roster = () => {
               var style;
               var topGroup = 0;
 
-              if (recommendedT6Ships.indexOf(shipName) > -1) {
+              if (recommendedT10Ships.indexOf(shipName) > -1) {
                 style = { fontWeight: 'bold', fontSize: 16, cursor: 'pointer' };
                 topGroup = 1;
               } else {

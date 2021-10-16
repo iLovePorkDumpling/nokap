@@ -16,6 +16,7 @@ import MissionStatement from "./components/MissionStatement";
 import Rules from "./components/Rules";
 import Roster from "./components/Roster";
 import T6Ships from "./components/T6Ships";
+import T10Ships from "./components/T10Ships";
 
 export default function App() {
   const [value, setValue] = React.useState(2);
@@ -45,6 +46,7 @@ export default function App() {
           <Tab label="Rules" />
           <Tab label="Roster" />
           <Tab label="T6 Ships" />
+          <Tab label="T10 Ships" />
         </Tabs>
         <TabPanel value={value} index={0}>
           <MissionStatement />
@@ -57,6 +59,9 @@ export default function App() {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <T6Ships />
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          <T10Ships />
         </TabPanel>
       </Paper>
     </Fragment>
