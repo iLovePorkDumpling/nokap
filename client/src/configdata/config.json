@@ -7,6 +7,6 @@
   "ACCOUNT_INFO_FIELDS": "nickname, statistics.pvp.battles, statistics.pvp.wins",
   "PLAYER_SHIP_API": "https://api.worldofwarships.com/wows/ships/stats/",
   "PLAYER_SHIP_FIELDS": "account_id, ship_id, pvp.battles, pvp.wins",
-  "SHIPS_INFO_API": "https://api.worldofwarships.com/wows/encyclopedia/ships",
+  "SHIPS_INFO_API": "https://api.worldofwarships.com/wows/encyclopedia/ships/",
   "SHIP_INFO_FIELDS": "ship_id, name, nation, tier, type"
 }
